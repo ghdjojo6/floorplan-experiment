@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="ko">
+<html lang="en">
 <head>
   <meta charset="UTF-8" />
   <title>Drag-and-Drop Floorplan Experiment Tool</title>
@@ -22,7 +22,7 @@
       height: 100vh;
     }
 
-    /* 헤더 */
+    /* Header */
     .header {
       padding: 12px 20px;
       background: #ffffff;
@@ -48,16 +48,16 @@
       color: #777;
     }
 
-    /* 메인 영역 */
+    /* Main layout */
     .main {
       flex: 1;
       display: grid;
-      grid-template-columns: 260px 1fr;
+      grid-template-columns: 280px 1fr;
       gap: 12px;
       padding: 12px;
     }
 
-    /* 패널 공통 */
+    /* Panel */
     .panel {
       background: #ffffff;
       border-radius: 14px;
@@ -101,13 +101,23 @@
       background: #888;
     }
 
-    /* 팔레트 */
+    /* Palette */
     .palette-list {
       display: flex;
       flex-direction: column;
       gap: 8px;
       overflow-y: auto;
       padding-right: 4px;
+    }
+
+    .palette-section-title {
+      font-size: 11px;
+      font-weight: 600;
+      color: #555;
+      margin-top: 4px;
+      margin-bottom: 2px;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
     }
 
     .shape-item {
@@ -157,7 +167,7 @@
       color: #666;
     }
 
-    /* 캔버스 영역 */
+    /* Canvas */
     .canvas-wrapper {
       display: flex;
       flex-direction: column;
@@ -227,21 +237,13 @@
       flex: 1;
       min-height: 360px;
       border-radius: 12px;
-      background: repeating-linear-gradient(
-        90deg,
-        #f4f4f4,
-        #f4f4f4 20px,
-        #eaeaea 20px,
-        #eaeaea 21px
-      ),
-      repeating-linear-gradient(
-        180deg,
-        #f4f4f4,
-        #f4f4f4 20px,
-        #eaeaea 20px,
-        #eaeaea 21px
-      );
-      border: 1px solid #ddd;
+      /* Clear grid background */
+      background:
+        linear-gradient(#e0e0e0 1px, transparent 1px),
+        linear-gradient(90deg, #e0e0e0 1px, transparent 1px);
+      background-size: 20px 20px;
+      background-position: 0 0;
+      border: 1px solid #ccc;
       overflow: hidden;
     }
 
@@ -254,6 +256,8 @@
       pointer-events: none;
       font-size: 13px;
       color: #999;
+      text-align: center;
+      padding: 0 24px;
     }
 
     .canvas-shape {
@@ -280,7 +284,7 @@
       line-height: 1.2;
     }
 
-    /* 하단 JSON 영역 */
+    /* Bottom JSON panel */
     .bottom-panel {
       border-top: 1px solid #eee;
       padding-top: 8px;
@@ -314,7 +318,7 @@
       margin-top: 2px;
     }
 
-    /* 스크롤바 */
+    /* Scrollbar */
     ::-webkit-scrollbar {
       width: 6px;
     }
@@ -337,106 +341,247 @@
 <div class="app-container">
   <header class="header">
     <div>
-      <div class="header-title">방 배치 설문 실험 도구</div>
+      <div class="header-title">Floorplan Arrangement Experiment Tool</div>
       <div class="header-subtitle">
-        왼쪽 도형(방 타입)을 드래그하여 오른쪽 캔버스에 배치하세요.
+        Drag room tiles from the left palette and drop them onto the grid canvas on the right.
       </div>
     </div>
     <div class="header-right">
-      Drag & Drop · Web-based Experimental Interface
+      Drag &amp; Drop · Web-based Spatial Arrangement Task
     </div>
   </header>
 
   <main class="main">
-    <!-- 팔레트 패널 -->
+    <!-- Palette -->
     <section class="panel">
       <div class="panel-header">
-        <span>도형 / 방 타입 팔레트</span>
-        <span class="tag"><span class="tag-dot"></span> Standardized Room Types</span>
+        <span>Room Type Palette</span>
+        <span class="tag"><span class="tag-dot"></span> Standardized Room Types · 3 Sizes Each</span>
       </div>
       <div class="panel-subtext">
-        각 방은 미리 정의된 유형입니다. 드래그하면 캔버스에 복제되어 배치됩니다.
+        Each item is a predefined room type and size (Small / Medium / Large). Drag to place multiple copies on the canvas.
       </div>
 
       <div class="palette-list" id="palette">
-        <!-- 예시 방 타입들 (원하면 여기서 추가/수정 가능) -->
+
+        <!-- LIVING ROOM -->
+        <div class="palette-section-title">Living Room</div>
         <div class="shape-item" draggable="true"
-             data-room-type="Li" data-label="Living Room" data-width="140" data-height="100">
-          <div class="shape-preview">Li</div>
+             data-room-type="Living room" data-size="Small"
+             data-label="Living room – Small" data-width="120" data-height="80">
+          <div class="shape-preview">LR S</div>
           <div class="shape-meta">
-            <div class="shape-name">거실 (Li)</div>
-            <div class="shape-info">140 × 100 (px) – 넓은 공용 공간</div>
+            <div class="shape-name">Living room – Small</div>
+            <div class="shape-info">120 × 80 (px)</div>
+          </div>
+        </div>
+        <div class="shape-item" draggable="true"
+             data-room-type="Living room" data-size="Medium"
+             data-label="Living room – Medium" data-width="140" data-height="100">
+          <div class="shape-preview">LR M</div>
+          <div class="shape-meta">
+            <div class="shape-name">Living room – Medium</div>
+            <div class="shape-info">140 × 100 (px)</div>
+          </div>
+        </div>
+        <div class="shape-item" draggable="true"
+             data-room-type="Living room" data-size="Large"
+             data-label="Living room – Large" data-width="160" data-height="120">
+          <div class="shape-preview">LR L</div>
+          <div class="shape-meta">
+            <div class="shape-name">Living room – Large</div>
+            <div class="shape-info">160 × 120 (px)</div>
           </div>
         </div>
 
+        <!-- KITCHEN -->
+        <div class="palette-section-title">Kitchen</div>
         <div class="shape-item" draggable="true"
-             data-room-type="Ki" data-label="Kitchen" data-width="120" data-height="80">
-          <div class="shape-preview">Ki</div>
+             data-room-type="Kitchen" data-size="Small"
+             data-label="Kitchen – Small" data-width="100" data-height="70">
+          <div class="shape-preview">K S</div>
           <div class="shape-meta">
-            <div class="shape-name">주방 (Ki)</div>
-            <div class="shape-info">120 × 80 (px) – 조리 및 식사 영역</div>
+            <div class="shape-name">Kitchen – Small</div>
+            <div class="shape-info">100 × 70 (px)</div>
+          </div>
+        </div>
+        <div class="shape-item" draggable="true"
+             data-room-type="Kitchen" data-size="Medium"
+             data-label="Kitchen – Medium" data-width="120" data-height="80">
+          <div class="shape-preview">K M</div>
+          <div class="shape-meta">
+            <div class="shape-name">Kitchen – Medium</div>
+            <div class="shape-info">120 × 80 (px)</div>
+          </div>
+        </div>
+        <div class="shape-item" draggable="true"
+             data-room-type="Kitchen" data-size="Large"
+             data-label="Kitchen – Large" data-width="140" data-height="90">
+          <div class="shape-preview">K L</div>
+          <div class="shape-meta">
+            <div class="shape-name">Kitchen – Large</div>
+            <div class="shape-info">140 × 90 (px)</div>
           </div>
         </div>
 
+        <!-- BEDROOM -->
+        <div class="palette-section-title">Bedroom</div>
         <div class="shape-item" draggable="true"
-             data-room-type="Be" data-label="Bedroom" data-width="110" data-height="80">
-          <div class="shape-preview">Be</div>
+             data-room-type="Bedroom" data-size="Small"
+             data-label="Bedroom – Small" data-width="110" data-height="70">
+          <div class="shape-preview">BR S</div>
           <div class="shape-meta">
-            <div class="shape-name">침실 (Be)</div>
-            <div class="shape-info">110 × 80 (px) – 개인 공간</div>
+            <div class="shape-name">Bedroom – Small</div>
+            <div class="shape-info">110 × 70 (px)</div>
+          </div>
+        </div>
+        <div class="shape-item" draggable="true"
+             data-room-type="Bedroom" data-size="Medium"
+             data-label="Bedroom – Medium" data-width="130" data-height="90">
+          <div class="shape-preview">BR M</div>
+          <div class="shape-meta">
+            <div class="shape-name">Bedroom – Medium</div>
+            <div class="shape-info">130 × 90 (px)</div>
+          </div>
+        </div>
+        <div class="shape-item" draggable="true"
+             data-room-type="Bedroom" data-size="Large"
+             data-label="Bedroom – Large" data-width="150" data-height="110">
+          <div class="shape-preview">BR L</div>
+          <div class="shape-meta">
+            <div class="shape-name">Bedroom – Large</div>
+            <div class="shape-info">150 × 110 (px)</div>
           </div>
         </div>
 
+        <!-- BATHROOM -->
+        <div class="palette-section-title">Bathroom</div>
         <div class="shape-item" draggable="true"
-             data-room-type="Ba" data-label="Bathroom" data-width="70" data-height="60">
-          <div class="shape-preview">Ba</div>
+             data-room-type="Bathroom" data-size="Small"
+             data-label="Bathroom – Small" data-width="60" data-height="50">
+          <div class="shape-preview">BA S</div>
           <div class="shape-meta">
-            <div class="shape-name">욕실 (Ba)</div>
-            <div class="shape-info">70 × 60 (px) – 욕실/화장실</div>
+            <div class="shape-name">Bathroom – Small</div>
+            <div class="shape-info">60 × 50 (px)</div>
+          </div>
+        </div>
+        <div class="shape-item" draggable="true"
+             data-room-type="Bathroom" data-size="Medium"
+             data-label="Bathroom – Medium" data-width="70" data-height="60">
+          <div class="shape-preview">BA M</div>
+          <div class="shape-meta">
+            <div class="shape-name">Bathroom – Medium</div>
+            <div class="shape-info">70 × 60 (px)</div>
+          </div>
+        </div>
+        <div class="shape-item" draggable="true"
+             data-room-type="Bathroom" data-size="Large"
+             data-label="Bathroom – Large" data-width="80" data-height="70">
+          <div class="shape-preview">BA L</div>
+          <div class="shape-meta">
+            <div class="shape-name">Bathroom – Large</div>
+            <div class="shape-info">80 × 70 (px)</div>
           </div>
         </div>
 
+        <!-- STORAGE -->
+        <div class="palette-section-title">Storage</div>
         <div class="shape-item" draggable="true"
-             data-room-type="St" data-label="Storage" data-width="60" data-height="60">
-          <div class="shape-preview">St</div>
+             data-room-type="Storage" data-size="Small"
+             data-label="Storage – Small" data-width="50" data-height="50">
+          <div class="shape-preview">ST S</div>
           <div class="shape-meta">
-            <div class="shape-name">수납/창고 (St)</div>
-            <div class="shape-info">60 × 60 (px) – 수납 공간</div>
+            <div class="shape-name">Storage – Small</div>
+            <div class="shape-info">50 × 50 (px)</div>
           </div>
         </div>
+        <div class="shape-item" draggable="true"
+             data-room-type="Storage" data-size="Medium"
+             data-label="Storage – Medium" data-width="60" data-height="60">
+          <div class="shape-preview">ST M</div>
+          <div class="shape-meta">
+            <div class="shape-name">Storage – Medium</div>
+            <div class="shape-info">60 × 60 (px)</div>
+          </div>
+        </div>
+        <div class="shape-item" draggable="true"
+             data-room-type="Storage" data-size="Large"
+             data-label="Storage – Large" data-width="70" data-height="70">
+          <div class="shape-preview">ST L</div>
+          <div class="shape-meta">
+            <div class="shape-name">Storage – Large</div>
+            <div class="shape-info">70 × 70 (px)</div>
+          </div>
+        </div>
+
+        <!-- BALCONY -->
+        <div class="palette-section-title">Balcony</div>
+        <div class="shape-item" draggable="true"
+             data-room-type="Balcony" data-size="Small"
+             data-label="Balcony – Small" data-width="80" data-height="40">
+          <div class="shape-preview">BL S</div>
+          <div class="shape-meta">
+            <div class="shape-name">Balcony – Small</div>
+            <div class="shape-info">80 × 40 (px)</div>
+          </div>
+        </div>
+        <div class="shape-item" draggable="true"
+             data-room-type="Balcony" data-size="Medium"
+             data-label="Balcony – Medium" data-width="100" data-height="50">
+          <div class="shape-preview">BL M</div>
+          <div class="shape-meta">
+            <div class="shape-name">Balcony – Medium</div>
+            <div class="shape-info">100 × 50 (px)</div>
+          </div>
+        </div>
+        <div class="shape-item" draggable="true"
+             data-room-type="Balcony" data-size="Large"
+             data-label="Balcony – Large" data-width="120" data-height="60">
+          <div class="shape-preview">BL L</div>
+          <div class="shape-meta">
+            <div class="shape-name">Balcony – Large</div>
+            <div class="shape-info">120 × 60 (px)</div>
+          </div>
+        </div>
+
       </div>
     </section>
 
-    <!-- 캔버스 + JSON 영역 -->
+    <!-- Canvas + JSON -->
     <section class="panel canvas-wrapper">
       <div class="panel-header">
-        <span>배치 캔버스</span>
+        <span>Layout Canvas</span>
       </div>
       <div class="canvas-toolbar">
         <div class="canvas-toolbar-left">
-          <span class="badge">Tip</span>
-          <span>도형 드래그 → 캔버스 드롭 · 선택 후 <b>Delete</b> 키로 삭제 가능</span>
+          <span class="badge">Instructions</span>
+          <span>
+            Drag a room tile onto the grid. Select a tile and press <b>Delete</b> to remove it. Tiles snap to the grid.
+          </span>
         </div>
         <div class="canvas-toolbar-right">
-          <button class="btn" id="clearCanvasBtn">모두 지우기</button>
-          <button class="btn btn-primary" id="exportJsonBtn">레이아웃 JSON 내보내기</button>
+          <button class="btn" id="clearCanvasBtn">Clear canvas</button>
+          <button class="btn btn-primary" id="exportJsonBtn">Export layout JSON</button>
         </div>
       </div>
 
       <div class="canvas" id="canvas">
         <div class="canvas-drop-hint" id="dropHint">
-          도형을 이 영역으로 드래그하여 배치하세요.
+          Drop room tiles here to construct your preferred layout.<br>
+          You can move tiles around freely on the grid.
         </div>
       </div>
 
       <div class="bottom-panel">
         <label>
-          현재 레이아웃 데이터 (JSON)
-          <span style="font-weight: normal; color:#999;">참가자 응답 저장 시 사용</span>
+          Current layout data (JSON)
+          <span style="font-weight: normal; color:#999;">Use this as the participant's response.</span>
         </label>
-        <textarea id="layoutOutput" readonly placeholder="‘레이아웃 JSON 내보내기’ 버튼을 누르면 이곳에 데이터가 표시됩니다."></textarea>
+        <textarea id="layoutOutput" readonly
+                  placeholder="Click 'Export layout JSON' to generate layout data here."></textarea>
         <div class="hint">
-          각 객체는 { id, roomType, label, x, y, width, height } 형태로 기록됩니다 (px 기준, 캔버스 좌상단 원점).
+          Each object is recorded as:
+          { id, roomType, size, label, x, y, width, height } (px, origin at top-left of the canvas).
         </div>
       </div>
     </section>
@@ -444,8 +589,8 @@
 </div>
 
 <script>
-  // ===== 설정 =====
-  const GRID_SIZE = 10; // 좌표를 10px 단위 그리드에 스냅
+  // ===== Settings =====
+  const GRID_SIZE = 10; // snap positions to 10px grid
 
   const canvas = document.getElementById('canvas');
   const palette = document.getElementById('palette');
@@ -454,18 +599,19 @@
   const clearCanvasBtn = document.getElementById('clearCanvasBtn');
   const exportJsonBtn = document.getElementById('exportJsonBtn');
 
-  let draggedShapeData = null;    // 팔레트에서 온 데이터
-  let shapesOnCanvas = [];        // { id, roomType, label, x, y, width, height }
+  let draggedShapeData = null;    // data from palette
+  let shapesOnCanvas = [];        // { id, roomType, size, label, x, y, width, height }
   let shapeIdCounter = 1;
   let selectedShapeId = null;
 
-  // ===== 팔레트 드래그 설정 =====
+  // ===== Palette drag setup =====
   palette.addEventListener('dragstart', (e) => {
     const item = e.target.closest('.shape-item');
     if (!item) return;
 
     draggedShapeData = {
       roomType: item.dataset.roomType,
+      size: item.dataset.size,
       label: item.dataset.label,
       width: parseInt(item.dataset.width, 10),
       height: parseInt(item.dataset.height, 10)
@@ -478,9 +624,9 @@
     draggedShapeData = null;
   });
 
-  // ===== 캔버스 드롭 영역 설정 =====
+  // ===== Canvas drop area =====
   canvas.addEventListener('dragover', (e) => {
-    e.preventDefault(); // drop 허용
+    e.preventDefault(); // allow drop
     e.dataTransfer.dropEffect = 'copy';
   });
 
@@ -489,16 +635,17 @@
     if (!draggedShapeData) return;
 
     const rect = canvas.getBoundingClientRect();
-    // 마우스 위치를 캔버스 좌표로 변환
+    // convert mouse position to canvas coordinates
     let x = e.clientX - rect.left - draggedShapeData.width / 2;
     let y = e.clientY - rect.top - draggedShapeData.height / 2;
 
-    // 그리드 스냅
+    // snap to grid
     x = Math.round(x / GRID_SIZE) * GRID_SIZE;
     y = Math.round(y / GRID_SIZE) * GRID_SIZE;
 
     addShapeToCanvas({
       roomType: draggedShapeData.roomType,
+      size: draggedShapeData.size,
       label: draggedShapeData.label,
       x,
       y,
@@ -507,8 +654,8 @@
     });
   });
 
-  // ===== 캔버스에 도형 추가 함수 =====
-  function addShapeToCanvas({ roomType, label, x, y, width, height }) {
+  // ===== Add shape to canvas =====
+  function addShapeToCanvas({ roomType, size, label, x, y, width, height }) {
     dropHint.style.display = 'none';
 
     const id = 'shape_' + (shapeIdCounter++);
@@ -522,17 +669,17 @@
 
     const labelEl = document.createElement('div');
     labelEl.className = 'canvas-shape-label';
-    labelEl.innerHTML = `<b>${roomType}</b><br>${label}`;
+    labelEl.innerHTML = `<b>${roomType}</b><br>${size}`;
     shapeEl.appendChild(labelEl);
 
     canvas.appendChild(shapeEl);
 
-    shapesOnCanvas.push({ id, roomType, label, x, y, width, height });
+    shapesOnCanvas.push({ id, roomType, size, label, x, y, width, height });
     attachShapeEvents(shapeEl);
     updateJsonOutput();
   }
 
-  // ===== 도형 이벤트(선택, 드래그 이동, 삭제 등) =====
+  // ===== Shape events (select, drag-move, delete) =====
   function attachShapeEvents(shapeEl) {
     shapeEl.addEventListener('mousedown', onShapeMouseDown);
     shapeEl.addEventListener('click', (e) => {
@@ -541,7 +688,7 @@
     });
   }
 
-  // 배경 클릭 시 선택 해제
+  // deselect when clicking empty canvas
   canvas.addEventListener('mousedown', (e) => {
     if (e.target === canvas) {
       selectShape(null);
@@ -556,7 +703,7 @@
     });
   }
 
-  // 키보드 삭제
+  // keyboard delete
   document.addEventListener('keydown', (e) => {
     if (e.key === 'Delete' || e.key === 'Backspace') {
       if (!selectedShapeId) return;
@@ -566,10 +713,9 @@
   });
 
   function deleteShape(id) {
-    // DOM 제거
     const el = canvas.querySelector(`.canvas-shape[data-id="${id}"]`);
     if (el) el.remove();
-    // 데이터 제거
+
     shapesOnCanvas = shapesOnCanvas.filter((s) => s.id !== id);
     if (shapesOnCanvas.length === 0) {
       dropHint.style.display = 'flex';
@@ -577,7 +723,7 @@
     updateJsonOutput();
   }
 
-  // 도형 드래그 이동 (캔버스 내부에서)
+  // drag move within canvas
   function onShapeMouseDown(e) {
     e.preventDefault();
     e.stopPropagation();
@@ -598,18 +744,17 @@
       let newX = initialLeft + dx;
       let newY = initialTop + dy;
 
-      // 그리드 스냅
+      // snap to grid
       newX = Math.round(newX / GRID_SIZE) * GRID_SIZE;
       newY = Math.round(newY / GRID_SIZE) * GRID_SIZE;
 
-      // 캔버스 범위 내로 제한 (간단하게)
+      // keep inside canvas
       newX = Math.max(0, Math.min(newX, rect.width - shapeEl.offsetWidth));
       newY = Math.max(0, Math.min(newY, rect.height - shapeEl.offsetHeight));
 
       shapeEl.style.left = newX + 'px';
       shapeEl.style.top = newY + 'px';
 
-      // 데이터 업데이트
       const id = shapeEl.dataset.id;
       const shapeData = shapesOnCanvas.find((s) => s.id === id);
       if (shapeData) {
@@ -628,17 +773,17 @@
     document.addEventListener('mouseup', onMouseUp);
   }
 
-  // ===== JSON 출력 =====
+  // ===== JSON output =====
   function updateJsonOutput() {
-    const clean = shapesOnCanvas.map(({ id, roomType, label, x, y, width, height }) => ({
-      id, roomType, label, x, y, width, height
+    const clean = shapesOnCanvas.map(({ id, roomType, size, label, x, y, width, height }) => ({
+      id, roomType, size, label, x, y, width, height
     }));
     layoutOutput.value = JSON.stringify(clean, null, 2);
   }
 
-  // ===== 버튼 기능 =====
+  // ===== Buttons =====
   clearCanvasBtn.addEventListener('click', () => {
-    if (!confirm('캔버스를 비우시겠습니까?')) return;
+    if (!confirm('Clear all tiles from the canvas?')) return;
     shapesOnCanvas = [];
     selectedShapeId = null;
     canvas.querySelectorAll('.canvas-shape').forEach((el) => el.remove());
@@ -647,8 +792,8 @@
   });
 
   exportJsonBtn.addEventListener('click', () => {
-    // 설문 시스템에 연결할 때는 여기서 AJAX/Fetch로 서버에 전송하면 됨
-    alert('현재 레이아웃 JSON이 아래에 표시되었습니다. 이 값을 설문 응답으로 저장하면 됩니다.');
+    // When integrating with a survey backend, send layoutOutput.value via POST.
+    alert('The current layout JSON has been generated below. Save or submit this value as the participant response.');
   });
 </script>
 </body>
