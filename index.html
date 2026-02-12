@@ -293,7 +293,7 @@
                 '<div class="form-group"><label>Orientation</label><select id="orientation-' + n + '">' + createSimpleOptions(orientations) + '</select></div>' +
                 '<div class="form-group full-width"><label>Adjacent to <span style="font-weight:400;color:#888;">(select all that apply)</span></label><div class="room-checkbox-group" id="adjacency-group-' + n + '">' + createCheckboxGroup('adjacency', n) + '</div></div>' +
                 '<div class="form-group full-width"><label>Connected to <span style="font-weight:400;color:#888;">(select all that apply)</span></label><div class="room-checkbox-group" id="connectivity-group-' + n + '">' + createCheckboxGroup('connectivity', n) + '</div></div>' +
-                '<div class="form-group full-width"><label>Additional Notes</label><textarea id="notes-' + n + '" placeholder="Any other spatial preferences or requirements..."></textarea></div>' +
+                '<div class="form-group full-width"><label>Additional Notes <span style="font-weight:400;color:#888;">(optional)</span></label><textarea id="notes-' + n + '" placeholder="Any other spatial preferences or requirements..."></textarea></div>' +
                 '</div></div></div>';
 
             document.getElementById('entries-container').insertAdjacentHTML('beforeend', html);
