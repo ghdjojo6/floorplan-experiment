@@ -55,6 +55,7 @@
         .add-entry-btn:hover, .submit-btn:hover { background: #0052a3; }
         .submit-btn { background: #28a745; margin-top: 30px; }
         .submit-btn:hover { background: #218838; }
+        .submit-btn:disabled { background: #6c757d; cursor: not-allowed; }
         .time-duration { font-size: 0.85rem; color: #666; margin-top: 4px; }
         .room-checkbox-group { border: 1px solid #ccc; border-radius: 4px; padding: 8px 12px; background: #fff; display: flex; flex-wrap: wrap; gap: 6px 16px; }
         .room-checkbox-group label { font-size: 0.9rem; font-weight: 400; color: #333; display: flex; align-items: center; gap: 5px; cursor: pointer; white-space: nowrap; }
@@ -67,6 +68,15 @@
         .hint-box-body p { font-size: 0.9rem; color: #333; margin-bottom: 8px; line-height: 1.6; }
         .hint-box-body p:last-child { margin-bottom: 0; }
         .hint-box-body strong { color: #0055aa; }
+
+        /* 제출 상태 오버레이 */
+        .submitting-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.45); z-index: 1000; align-items: center; justify-content: center; }
+        .submitting-overlay.active { display: flex; }
+        .submitting-box { background: #fff; border-radius: 8px; padding: 40px 48px; text-align: center; box-shadow: 0 8px 32px rgba(0,0,0,0.18); }
+        .spinner { width: 48px; height: 48px; border: 5px solid #e0e0e0; border-top-color: #0066cc; border-radius: 50%; animation: spin 0.9s linear infinite; margin: 0 auto 20px; }
+        @keyframes spin { to { transform: rotate(360deg); } }
+        .submitting-box p { font-size: 1.05rem; color: #444; }
+
         @media (max-width: 768px) {
             h1 { font-size: 1.5rem; }
             .form-grid { grid-template-columns: 1fr; }
@@ -75,394 +85,435 @@
     </style>
 </head>
 <body>
-    <div class="container">
-        <div class="survey-container" id="survey-container">
-            <header>
-                <h1>Daily Activity &amp; Housing Preference Survey</h1>
-                <p class="subtitle">Document your weekday activities and describe your ideal residential room structure for each activity</p>
-            </header>
-            <div class="prolific-section">
-                <label for="prolific-id">Prolific ID *</label>
-                <input type="text" id="prolific-id" placeholder="Enter your Prolific ID" required>
-            </div>
-            <div class="housing-section">
-                <h3>Housing Information</h3>
-                <div class="form-grid">
-                    <div class="form-group">
-                        <label>Household Type *</label>
-                        <select id="household-type" required>
-                            <option value="">Select...</option>
-                            <option value="one_person">One person</option>
-                            <option value="cohabitating_couple">Cohabitating couple</option>
-                            <option value="family_no_children">Family with no children</option>
-                            <option value="family_dependent_children">Family with dependent children</option>
-                            <option value="family_nondependent_children">Family with non-dependent children only</option>
-                            <option value="multi_family">Multi-family</option>
-                            <option value="non_relatives">Non-relatives only</option>
-                        </select>
-                    </div>
-                    <div class="form-group">
-                        <label>Household Size *</label>
-                        <select id="household-size" required>
-                            <option value="">Select...</option>
-                            <option value="1">1</option>
-                            <option value="2">2</option>
-                            <option value="3">3</option>
-                            <option value="4">4</option>
-                            <option value="5">5</option>
-                            <option value="6_or_more">6 or more</option>
-                        </select>
-                    </div>
-                    <div class="form-group">
-                        <label>Working Status *</label>
-                        <select id="working-status" required>
-                            <option value="">Select...</option>
-                            <option value="full_time">Full time worker (more than 35h a week)</option>
-                            <option value="part_time">Part time worker (less than 35h a week)</option>
-                            <option value="non_working">Non-working adult</option>
-                            <option value="retired">Retired</option>
-                        </select>
-                    </div>
-                    <div class="form-group">
-                        <label>Amount of time spent at home *</label>
-                        <select id="time-at-home" required>
-                            <option value="">Select...</option>
-                            <option value="under_1h">Under 1h</option>
-                            <option value="1h">1h</option>
-                            <option value="2h">2h</option>
-                            <option value="3h">3h</option>
-                            <option value="4h">4h</option>
-                            <option value="5h">5h</option>
-                            <option value="6h">6h</option>
-                            <option value="7h">7h</option>
-                            <option value="8h">8h</option>
-                            <option value="9h">9h</option>
-                            <option value="10h">10h</option>
-                            <option value="11h">11h</option>
-                            <option value="12h">12h</option>
-                            <option value="13h">13h</option>
-                            <option value="14h">14h</option>
-                            <option value="15h">15h</option>
-                            <option value="16h">16h</option>
-                            <option value="17h">17h</option>
-                            <option value="18h">18h</option>
-                            <option value="19h">19h</option>
-                            <option value="20h">20h</option>
-                            <option value="21h">21h</option>
-                            <option value="22h">22h</option>
-                            <option value="23h">23h</option>
-                            <option value="24h">24h</option>
-                        </select>
-                    </div>
-                </div>
-            </div>
-            <div class="info-box">
-                <p>📋 <strong>Please record all activities from 4:00 AM to 4:00 AM (the following day)</strong> during a typical weekday. For each activity, <strong>describe your ideal residential room preferences</strong> for performing that activity. You can add entries for additional activities, and please be as specific as possible.</p>
-            </div>
-            <div class="hint-box" id="hint-box">
-                <div class="hint-box-header" onclick="toggleHint()">
-                    <span>💡 How to fill in activities</span>
-                    <button class="hint-toggle" id="hint-toggle-btn">Hide ▲</button>
-                </div>
-                <div class="hint-box-body" id="hint-box-body">
-                    <p><strong>Main Activity:</strong> The activity that takes up most of your attention during a time period. Main activities <strong>cannot overlap</strong> and must <strong>account for all 24 hours</strong> of your day. For example, making dinner from 7:00 PM to 7:10 PM.</p>
-                    <p><strong>Secondary Activity:</strong> Something you do <em>alongside</em> a main activity at the same time. For example, checking your phone while making dinner — where making dinner is the main activity and the other one is secondary.</p>
-                </div>
-            </div>
-            <div id="entries-container" class="entries-container"></div>
-            <button class="add-entry-btn" onclick="addEntry()">+ Add Activity Entry</button>
-            <button class="submit-btn" onclick="submitSurvey()">Submit Survey</button>
+
+<!-- 제출 중 오버레이 -->
+<div class="submitting-overlay" id="submitting-overlay">
+    <div class="submitting-box">
+        <div class="spinner"></div>
+        <p>Submitting your survey…<br><small style="color:#888;">Please do not close this page.</small></p>
+    </div>
+</div>
+
+<div class="container">
+    <div class="survey-container" id="survey-container">
+        <header>
+            <h1>Daily Activity &amp; Housing Preference Survey</h1>
+            <p class="subtitle">Document your weekday activities and describe your ideal residential room structure for each activity</p>
+        </header>
+        <div class="prolific-section">
+            <label for="prolific-id">Prolific ID *</label>
+            <input type="text" id="prolific-id" placeholder="Enter your Prolific ID" required>
         </div>
-        <div class="completion-page" id="completion-page">
-            <div class="completion-box">
-                <h2>&#10003; Survey Complete!</h2>
-                <p>Your response has been recorded.</p>
-                <p>Please return to Prolific through this link or with the code below to complete your submission.</p>
-                <div class="completion-code">COC9BJ2P</div>
-                <a href="https://app.prolific.com/submissions/complete?cc=COC9BJ2P" class="prolific-link" target="_blank">Return to Prolific</a>
+        <div class="housing-section">
+            <h3>Housing Information</h3>
+            <div class="form-grid">
+                <div class="form-group">
+                    <label>Household Type *</label>
+                    <select id="household-type" required>
+                        <option value="">Select...</option>
+                        <option value="one_person">One person</option>
+                        <option value="cohabitating_couple">Cohabitating couple</option>
+                        <option value="family_no_children">Family with no children</option>
+                        <option value="family_dependent_children">Family with dependent children</option>
+                        <option value="family_nondependent_children">Family with non-dependent children only</option>
+                        <option value="multi_family">Multi-family</option>
+                        <option value="non_relatives">Non-relatives only</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Household Size *</label>
+                    <select id="household-size" required>
+                        <option value="">Select...</option>
+                        <option value="1">1</option>
+                        <option value="2">2</option>
+                        <option value="3">3</option>
+                        <option value="4">4</option>
+                        <option value="5">5</option>
+                        <option value="6_or_more">6 or more</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Working Status *</label>
+                    <select id="working-status" required>
+                        <option value="">Select...</option>
+                        <option value="full_time">Full time worker (more than 35h a week)</option>
+                        <option value="part_time">Part time worker (less than 35h a week)</option>
+                        <option value="non_working">Non-working adult</option>
+                        <option value="retired">Retired</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Amount of time spent at home *</label>
+                    <select id="time-at-home" required>
+                        <option value="">Select...</option>
+                        <option value="under_1h">Under 1h</option>
+                        <option value="1h">1h</option>
+                        <option value="2h">2h</option>
+                        <option value="3h">3h</option>
+                        <option value="4h">4h</option>
+                        <option value="5h">5h</option>
+                        <option value="6h">6h</option>
+                        <option value="7h">7h</option>
+                        <option value="8h">8h</option>
+                        <option value="9h">9h</option>
+                        <option value="10h">10h</option>
+                        <option value="11h">11h</option>
+                        <option value="12h">12h</option>
+                        <option value="13h">13h</option>
+                        <option value="14h">14h</option>
+                        <option value="15h">15h</option>
+                        <option value="16h">16h</option>
+                        <option value="17h">17h</option>
+                        <option value="18h">18h</option>
+                        <option value="19h">19h</option>
+                        <option value="20h">20h</option>
+                        <option value="21h">21h</option>
+                        <option value="22h">22h</option>
+                        <option value="23h">23h</option>
+                        <option value="24h">24h</option>
+                    </select>
+                </div>
             </div>
+        </div>
+        <div class="info-box">
+            <p>📋 <strong>Please record all activities from 4:00 AM to 4:00 AM (the following day)</strong> during a typical weekday. For each activity, <strong>describe your ideal residential room preferences</strong> for performing that activity. You can add entries for additional activities, and please be as specific as possible.</p>
+        </div>
+        <div class="hint-box" id="hint-box">
+            <div class="hint-box-header" onclick="toggleHint()">
+                <span>💡 How to fill in activities</span>
+                <button class="hint-toggle" id="hint-toggle-btn">Hide ▲</button>
+            </div>
+            <div class="hint-box-body" id="hint-box-body">
+                <p><strong>Main Activity:</strong> The activity that takes up most of your attention during a time period. Main activities <strong>cannot overlap</strong> and must <strong>account for all 24 hours</strong> of your day. For example, making dinner from 7:00 PM to 7:10 PM.</p>
+                <p><strong>Secondary Activity:</strong> Something you do <em>alongside</em> a main activity at the same time. For example, checking your phone while making dinner — where making dinner is the main activity and the other one is secondary.</p>
+            </div>
+        </div>
+        <div id="entries-container" class="entries-container"></div>
+        <button class="add-entry-btn" onclick="addEntry()">+ Add Activity Entry</button>
+        <button class="submit-btn" id="submit-btn" onclick="submitSurvey()">Submit Survey</button>
+    </div>
+    <div class="completion-page" id="completion-page">
+        <div class="completion-box">
+            <h2>&#10003; Survey Complete!</h2>
+            <p>Your response has been recorded.</p>
+            <p>Please return to Prolific through this link or with the code below to complete your submission.</p>
+            <div class="completion-code">COC9BJ2P</div>
+            <a href="https://app.prolific.com/submissions/complete?cc=COC9BJ2P" class="prolific-link" target="_blank">Return to Prolific</a>
         </div>
     </div>
-    <script>
-        const activitiesGrouped = [
-            { label: "Sleeping, personal care, medication", options: [{value:"1",text:"1. Sleeping"},{value:"2",text:"2. Washing, dressing, using the bathroom and self-grooming"},{value:"3",text:"3. Medication, other health related care"}]},
-            { label: "Eating, drinking, cooking", options: [{value:"4",text:"4. Making food and drinks, cooking"},{value:"5",text:"5. Eating a meal, eating out, take-away"},{value:"6",text:"6. Snacking"},{value:"7",text:"7. Drinking (e.g. tea, coffee, alcohol)"}]},
-            { label: "Work and other activities for pay", options: [{value:"8",text:"8. Working"},{value:"9",text:"9. Working from home"},{value:"10",text:"10. Working from a café or other workspace"},{value:"11",text:"11. Providing childcare, cleaning, or doing odd jobs for pay"},{value:"12",text:"12. Leasing or renting things you own"},{value:"13",text:"13. Using your private vehicle to earn money"},{value:"14",text:"14. Showing your own house, flat, or building to potential buyers"},{value:"15",text:"15. Selling your things, apart from your home"}]},
-            { label: "Travel and getting around", options: [{value:"16",text:"16. Travelling to or from paid work"},{value:"17",text:"17. Travelling to or from unpaid work"},{value:"18",text:"18. Travelling to or from a shop"},{value:"19",text:"19. Travelling to or from socialising with others"},{value:"20",text:"20. Travelling to escort children to or from childcare or school"},{value:"21",text:"21. Travelling to or from another place"},{value:"22",text:"22. Packing or unpacking, preparing for journey"}]},
-            { label: "Housework, pets, DIY and gardening", options: [{value:"23",text:"23. Cleaning, hoovering, tidying house, sorting the bins"},{value:"24",text:"24. Using dishwasher or washing up"},{value:"25",text:"25. Arranging, sorting or unpacking household items"},{value:"26",text:"26. Ironing, washing, other laundry tasks or mending clothes"},{value:"27",text:"27. Repairing, maintaining or making household goods, or vehicles"},{value:"28",text:"28. Lighting fire or cleaning fireplace, log burner or wood burning stove"},{value:"29",text:"29. Feeding, caring for or playing with animals (pets)"},{value:"30",text:"30. Walking the dog"},{value:"31",text:"31. DIY"},{value:"32",text:"32. Gardening"}]},
-            { label: "Volunteering", options: [{value:"33",text:"33. Volunteering as part of a group, organisation, charity, or sports club"}]},
-            { label: "Caring for and looking after children and adults", options: [{value:"34",text:"34. Feeding, washing, dressing or preparing meals for children"},{value:"35",text:"35. Reading with children, helping with homework"},{value:"36",text:"36. Playing with children"},{value:"37",text:"37. Attending or watching a child's event or activity"},{value:"38",text:"38. Supporting, comforting or cuddling children"},{value:"39",text:"39. Other childcare not elsewhere listed"},{value:"40",text:"40. Helping, caring for and looking after adults (aged 18+)"}]},
-            { label: "Shopping, household administration tasks and appointments", options: [{value:"41",text:"41. Buying something, shopping"},{value:"42",text:"42. Browsing things to buy later, or window shopping"},{value:"43",text:"43. Household administration tasks"},{value:"44",text:"44. Attending appointments or errands"},{value:"45",text:"45. Queueing or waiting"},{value:"46",text:"46. Completing a document"}]},
-            { label: "Free time, entertainment and socialising", options: [{value:"47",text:"47. Watching TV and DVDs"},{value:"48",text:"48. Checking phone or tablet"},{value:"49",text:"49. Listening to music, podcasts, audiobooks, talk shows, radio or news"},{value:"50",text:"50. Playing games or computer gaming"},{value:"51",text:"51. Checking or using social media"},{value:"52",text:"52. Browsing internet"},{value:"53",text:"53. Checking email"},{value:"54",text:"54. Reading books, magazines or newspapers"},{value:"55",text:"55. Socialising, spending time with friends, family, neighbours and colleagues"},{value:"56",text:"56. Having a conversation"},{value:"57",text:"57. Writing, texting or emailing"},{value:"58",text:"58. Visits to cinema, theatre, concerts, sporting events, museums, galleries, library etc."},{value:"59",text:"59. Attending a meeting or an event"},{value:"60",text:"60. Hobbies and other leisure activities"},{value:"61",text:"61. Resting (doing nothing) or in bed not asleep"}]},
-            { label: "Exercise, health and being active", options: [{value:"62",text:"62. Gym, fitness, or exercise classes"},{value:"63",text:"63. Running or jogging"},{value:"64",text:"64. Cycling"},{value:"65",text:"65. Playing team sports"},{value:"66",text:"66. Playing other sports and exercising"},{value:"67",text:"67. Going for a walk as exercise"},{value:"68",text:"68. Meditating, having a massage, spa or wellbeing treatments"},{value:"69",text:"69. Other health or well-being activity"}]},
-            { label: "Education and study", options: [{value:"70",text:"70. Attending formal education or taking a course"},{value:"71",text:"71. Learning or teaching yourself a skill not involving taught classes"},{value:"72",text:"72. Studying, revising or doing homework"}]},
-            { label: "Other computer use", options: [{value:"73",text:"73. Other computer or laptop use"}]},
-            { label: "Other or personal", options: [{value:"74",text:"74. Other activities not listed"},{value:"75",text:"75. Praying"},{value:"76",text:"76. Smoking or vaping"},{value:"77",text:"77. Completing the time-use diary"}]}
-        ];
+</div>
 
-        const whoForOptions = [
-            {value:"",text:"Select..."},
-            {value:"myself/whole household",text:"Myself/Household"},
-            {value:"child",text:"Child/Children"},
-            {value:"adult",text:"Another Adult"}
-        ];
+<script>
+    // =========================================================
+    // ★ Google Apps Script Web App URL을 여기에 붙여넣으세요 ★
+    // =========================================================
+    const APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxs_LS3HMhsFuK6JJL0iSu_ObHX39SuZ0IDrN7jUGiq86bCg-62MHE4zo_2ZBLrqkPwvg/exec";
+    // =========================================================
 
-        const whereTypes = [
-            {value:"",text:"Select location..."},
-            {value:"living_room",text:"Living Room"},
-            {value:"kitchen",text:"Kitchen"},
-            {value:"dining_room",text:"Dining Room"},
-            {value:"bedroom1",text:"Bedroom1"},
-            {value:"bedroom2",text:"Bedroom2"},
-            {value:"bedroom3",text:"Bedroom3"},
-            {value:"bedroom4",text:"Bedroom4"},
-            {value:"bedroom5",text:"Bedroom5"},
-            {value:"bedroom6",text:"Bedroom6"},
-            {value:"bathroom1",text:"Bathroom1"},
-            {value:"bathroom2",text:"Bathroom2"},
-            {value:"bathroom3",text:"Bathroom3"},
-            {value:"storage",text:"Storage"},
-            {value:"garage",text:"Garage"},
-            {value:"balcony_terrace_garden",text:"Balcony/Terrace/Garden"},
-            {value:"other",text:"Other Place"}
-        ];
+    const activitiesGrouped = [
+        { label: "Sleeping, personal care, medication", options: [{value:"1",text:"1. Sleeping"},{value:"2",text:"2. Washing, dressing, using the bathroom and self-grooming"},{value:"3",text:"3. Medication, other health related care"}]},
+        { label: "Eating, drinking, cooking", options: [{value:"4",text:"4. Making food and drinks, cooking"},{value:"5",text:"5. Eating a meal, eating out, take-away"},{value:"6",text:"6. Snacking"},{value:"7",text:"7. Drinking (e.g. tea, coffee, alcohol)"}]},
+        { label: "Work and other activities for pay", options: [{value:"8",text:"8. Working"},{value:"9",text:"9. Working from home"},{value:"10",text:"10. Working from a café or other workspace"},{value:"11",text:"11. Providing childcare, cleaning, or doing odd jobs for pay"},{value:"12",text:"12. Leasing or renting things you own"},{value:"13",text:"13. Using your private vehicle to earn money"},{value:"14",text:"14. Showing your own house, flat, or building to potential buyers"},{value:"15",text:"15. Selling your things, apart from your home"}]},
+        { label: "Travel and getting around", options: [{value:"16",text:"16. Travelling to or from paid work"},{value:"17",text:"17. Travelling to or from unpaid work"},{value:"18",text:"18. Travelling to or from a shop"},{value:"19",text:"19. Travelling to or from socialising with others"},{value:"20",text:"20. Travelling to escort children to or from childcare or school"},{value:"21",text:"21. Travelling to or from another place"},{value:"22",text:"22. Packing or unpacking, preparing for journey"}]},
+        { label: "Housework, pets, DIY and gardening", options: [{value:"23",text:"23. Cleaning, hoovering, tidying house, sorting the bins"},{value:"24",text:"24. Using dishwasher or washing up"},{value:"25",text:"25. Arranging, sorting or unpacking household items"},{value:"26",text:"26. Ironing, washing, other laundry tasks or mending clothes"},{value:"27",text:"27. Repairing, maintaining or making household goods, or vehicles"},{value:"28",text:"28. Lighting fire or cleaning fireplace, log burner or wood burning stove"},{value:"29",text:"29. Feeding, caring for or playing with animals (pets)"},{value:"30",text:"30. Walking the dog"},{value:"31",text:"31. DIY"},{value:"32",text:"32. Gardening"}]},
+        { label: "Volunteering", options: [{value:"33",text:"33. Volunteering as part of a group, organisation, charity, or sports club"}]},
+        { label: "Caring for and looking after children and adults", options: [{value:"34",text:"34. Feeding, washing, dressing or preparing meals for children"},{value:"35",text:"35. Reading with children, helping with homework"},{value:"36",text:"36. Playing with children"},{value:"37",text:"37. Attending or watching a child's event or activity"},{value:"38",text:"38. Supporting, comforting or cuddling children"},{value:"39",text:"39. Other childcare not elsewhere listed"},{value:"40",text:"40. Helping, caring for and looking after adults (aged 18+)"}]},
+        { label: "Shopping, household administration tasks and appointments", options: [{value:"41",text:"41. Buying something, shopping"},{value:"42",text:"42. Browsing things to buy later, or window shopping"},{value:"43",text:"43. Household administration tasks"},{value:"44",text:"44. Attending appointments or errands"},{value:"45",text:"45. Queueing or waiting"},{value:"46",text:"46. Completing a document"}]},
+        { label: "Free time, entertainment and socialising", options: [{value:"47",text:"47. Watching TV and DVDs"},{value:"48",text:"48. Checking phone or tablet"},{value:"49",text:"49. Listening to music, podcasts, audiobooks, talk shows, radio or news"},{value:"50",text:"50. Playing games or computer gaming"},{value:"51",text:"51. Checking or using social media"},{value:"52",text:"52. Browsing internet"},{value:"53",text:"53. Checking email"},{value:"54",text:"54. Reading books, magazines or newspapers"},{value:"55",text:"55. Socialising, spending time with friends, family, neighbours and colleagues"},{value:"56",text:"56. Having a conversation"},{value:"57",text:"57. Writing, texting or emailing"},{value:"58",text:"58. Visits to cinema, theatre, concerts, sporting events, museums, galleries, library etc."},{value:"59",text:"59. Attending a meeting or an event"},{value:"60",text:"60. Hobbies and other leisure activities"},{value:"61",text:"61. Resting (doing nothing) or in bed not asleep"}]},
+        { label: "Exercise, health and being active", options: [{value:"62",text:"62. Gym, fitness, or exercise classes"},{value:"63",text:"63. Running or jogging"},{value:"64",text:"64. Cycling"},{value:"65",text:"65. Playing team sports"},{value:"66",text:"66. Playing other sports and exercising"},{value:"67",text:"67. Going for a walk as exercise"},{value:"68",text:"68. Meditating, having a massage, spa or wellbeing treatments"},{value:"69",text:"69. Other health or well-being activity"}]},
+        { label: "Education and study", options: [{value:"70",text:"70. Attending formal education or taking a course"},{value:"71",text:"71. Learning or teaching yourself a skill not involving taught classes"},{value:"72",text:"72. Studying, revising or doing homework"}]},
+        { label: "Other computer use", options: [{value:"73",text:"73. Other computer or laptop use"}]},
+        { label: "Other or personal", options: [{value:"74",text:"74. Other activities not listed"},{value:"75",text:"75. Praying"},{value:"76",text:"76. Smoking or vaping"},{value:"77",text:"77. Completing the time-use diary"}]}
+    ];
 
-        const roomTypesNoOutside = [
-            {value:"",text:"Select room type..."},
-            {value:"living_room",text:"Living Room"},
-            {value:"kitchen",text:"Kitchen"},
-            {value:"dining_room",text:"Dining Room"},
-            {value:"bedroom1",text:"Bedroom1"},
-            {value:"bedroom2",text:"Bedroom2"},
-            {value:"bedroom3",text:"Bedroom3"},
-            {value:"bedroom4",text:"Bedroom4"},
-            {value:"bedroom5",text:"Bedroom5"},
-            {value:"bedroom6",text:"Bedroom6"},
-            {value:"bathroom1",text:"Bathroom1"},
-            {value:"bathroom2",text:"Bathroom2"},
-            {value:"bathroom3",text:"Bathroom3"},
-            {value:"storage",text:"Storage"},
-            {value:"garage",text:"Garage"},
-            {value:"balcony_terrace_garden",text:"Balcony/Terrace/Garden"}
-        ];
+    const whoForOptions = [
+        {value:"",text:"Select..."},
+        {value:"myself/whole household",text:"Myself/Household"},
+        {value:"child",text:"Child/Children"},
+        {value:"adult",text:"Another Adult"}
+    ];
 
-        const roomCheckboxOptions = [
-            {value:"living_room",text:"Living Room"},
-            {value:"kitchen",text:"Kitchen"},
-            {value:"dining_room",text:"Dining Room"},
-            {value:"bedroom1",text:"Bedroom1"},
-            {value:"bedroom2",text:"Bedroom2"},
-            {value:"bedroom3",text:"Bedroom3"},
-            {value:"bedroom4",text:"Bedroom4"},
-            {value:"bedroom5",text:"Bedroom5"},
-            {value:"bedroom6",text:"Bedroom6"},
-            {value:"bathroom1",text:"Bathroom1"},
-            {value:"bathroom2",text:"Bathroom2"},
-            {value:"bathroom3",text:"Bathroom3"},
-            {value:"storage",text:"Storage"},
-            {value:"garage",text:"Garage"},
-            {value:"balcony_terrace_garden",text:"Balcony/Terrace/Garden"}
-        ];
+    const whereTypes = [
+        {value:"",text:"Select location..."},
+        {value:"living_room",text:"Living Room"},
+        {value:"kitchen",text:"Kitchen"},
+        {value:"dining_room",text:"Dining Room"},
+        {value:"bedroom1",text:"Bedroom1"},
+        {value:"bedroom2",text:"Bedroom2"},
+        {value:"bedroom3",text:"Bedroom3"},
+        {value:"bedroom4",text:"Bedroom4"},
+        {value:"bedroom5",text:"Bedroom5"},
+        {value:"bedroom6",text:"Bedroom6"},
+        {value:"bathroom1",text:"Bathroom1"},
+        {value:"bathroom2",text:"Bathroom2"},
+        {value:"bathroom3",text:"Bathroom3"},
+        {value:"storage",text:"Storage"},
+        {value:"garage",text:"Garage"},
+        {value:"balcony_terrace_garden",text:"Balcony/Terrace/Garden"},
+        {value:"other",text:"Other Place"}
+    ];
 
-        const sizeOptions = [
-            { value:"", text:"Select size..." },
-            { value:"under_30sqft", 
-              text:"Under 30 sq ft (About the size of one to two standard desks)" },
-            { value:"30_60sqft", 
-              text:"30–60 sq ft (About the size of a single bed)" },
-            { value:"60_100sqft", 
-              text:"60–100 sq ft (About the size of a queen bed with minimal clearance)" },
-            { value:"100_160sqft", 
-              text:"100–160 sq ft (About the size of two queen beds)" },
-            { value:"160_220sqft", 
-              text:"160–220 sq ft (About the size of a small car)" },
-            { value:"220_300sqft", 
-              text:"220–300 sq ft (About the size of a standard parking space)" },
-            { value:"over_300sqft", 
-              text:"Over 300 sq ft (About the size of a large studio apartment)" }
-        ];
+    const roomTypesNoOutside = [
+        {value:"",text:"Select room type..."},
+        {value:"living_room",text:"Living Room"},
+        {value:"kitchen",text:"Kitchen"},
+        {value:"dining_room",text:"Dining Room"},
+        {value:"bedroom1",text:"Bedroom1"},
+        {value:"bedroom2",text:"Bedroom2"},
+        {value:"bedroom3",text:"Bedroom3"},
+        {value:"bedroom4",text:"Bedroom4"},
+        {value:"bedroom5",text:"Bedroom5"},
+        {value:"bedroom6",text:"Bedroom6"},
+        {value:"bathroom1",text:"Bathroom1"},
+        {value:"bathroom2",text:"Bathroom2"},
+        {value:"bathroom3",text:"Bathroom3"},
+        {value:"storage",text:"Storage"},
+        {value:"garage",text:"Garage"},
+        {value:"balcony_terrace_garden",text:"Balcony/Terrace/Garden"}
+    ];
 
-        const orientations = [
-            {value:"",text:"Select orientation..."},
-            {value:"north",text:"North"},
-            {value:"south",text:"South"},
-            {value:"east",text:"East"},
-            {value:"west",text:"West"}
-        ];
+    const roomCheckboxOptions = [
+        {value:"living_room",text:"Living Room"},
+        {value:"kitchen",text:"Kitchen"},
+        {value:"dining_room",text:"Dining Room"},
+        {value:"bedroom1",text:"Bedroom1"},
+        {value:"bedroom2",text:"Bedroom2"},
+        {value:"bedroom3",text:"Bedroom3"},
+        {value:"bedroom4",text:"Bedroom4"},
+        {value:"bedroom5",text:"Bedroom5"},
+        {value:"bedroom6",text:"Bedroom6"},
+        {value:"bathroom1",text:"Bathroom1"},
+        {value:"bathroom2",text:"Bathroom2"},
+        {value:"bathroom3",text:"Bathroom3"},
+        {value:"storage",text:"Storage"},
+        {value:"garage",text:"Garage"},
+        {value:"balcony_terrace_garden",text:"Balcony/Terrace/Garden"}
+    ];
 
-        let entryCount = 0;
+    const sizeOptions = [
+        { value:"", text:"Select size..." },
+        { value:"under_30sqft", text:"Under 30 sq ft (About the size of one to two standard desks)" },
+        { value:"30_60sqft", text:"30–60 sq ft (About the size of a single bed)" },
+        { value:"60_100sqft", text:"60–100 sq ft (About the size of a queen bed with minimal clearance)" },
+        { value:"100_160sqft", text:"100–160 sq ft (About the size of two queen beds)" },
+        { value:"160_220sqft", text:"160–220 sq ft (About the size of a small car)" },
+        { value:"220_300sqft", text:"220–300 sq ft (About the size of a standard parking space)" },
+        { value:"over_300sqft", text:"Over 300 sq ft (About the size of a large studio apartment)" }
+    ];
 
-        function createActivityOptions() {
-            let html = '<option value="">Select an activity...</option>';
-            activitiesGrouped.forEach(g => {
-                html += '<optgroup label="' + g.label + '">';
-                g.options.forEach(o => { html += '<option value="' + o.value + '">' + o.text + '</option>'; });
-                html += '</optgroup>';
-            });
-            return html;
+    const orientations = [
+        {value:"",text:"Select orientation..."},
+        {value:"north",text:"North"},
+        {value:"south",text:"South"},
+        {value:"east",text:"East"},
+        {value:"west",text:"West"}
+    ];
+
+    let entryCount = 0;
+
+    function createActivityOptions() {
+        let html = '<option value="">Select an activity...</option>';
+        activitiesGrouped.forEach(g => {
+            html += '<optgroup label="' + g.label + '">';
+            g.options.forEach(o => { html += '<option value="' + o.value + '">' + o.text + '</option>'; });
+            html += '</optgroup>';
+        });
+        return html;
+    }
+
+    function createSimpleOptions(arr) {
+        return arr.map(o => '<option value="' + o.value + '">' + o.text + '</option>').join('');
+    }
+
+    function createCheckboxGroup(name, id) {
+        return roomCheckboxOptions.map(o =>
+            '<label><input type="checkbox" name="' + name + '-' + id + '" value="' + o.value + '"> ' + o.text + '</label>'
+        ).join('');
+    }
+
+    function toggleHint() {
+        const body = document.getElementById('hint-box-body');
+        const btn = document.getElementById('hint-toggle-btn');
+        const isVisible = body.style.display !== 'none';
+        body.style.display = isVisible ? 'none' : 'block';
+        btn.textContent = isVisible ? 'Show ▼' : 'Hide ▲';
+    }
+
+    function addEntry() {
+        entryCount++;
+        const n = entryCount;
+        const isFirst = n === 1;
+        const defaultStart = isFirst ? '04:00' : '';
+
+        const html = '<div class="entry-card" id="entry-' + n + '">' +
+            '<div class="entry-header">' +
+            '<span class="entry-number">Entry #' + n + '</span>' +
+            (!isFirst ? '<button class="delete-btn" onclick="deleteEntry(' + n + ')">Delete</button>' : '') +
+            '</div>' +
+            '<div class="form-grid">' +
+            '<div class="form-group"><label>Start Time *</label><input type="time" id="start-' + n + '" value="' + defaultStart + '" ' + (isFirst ? 'readonly' : '') + ' onchange="calculateDuration(' + n + ')"></div>' +
+            '<div class="form-group"><label>End Time *</label><input type="time" id="end-' + n + '" onchange="calculateDuration(' + n + ')"><div class="time-duration" id="duration-' + n + '"></div></div>' +
+            '<div class="form-group"><label>Main Activity *</label><select id="main-activity-' + n + '">' + createActivityOptions() + '</select></div>' +
+            '<div class="form-group"><label>Secondary Activity</label><select id="secondary-activity-' + n + '">' + createActivityOptions() + '</select></div>' +
+            '<div class="form-group"><label>Where *</label><select id="where-' + n + '" onchange="toggleWhereOther(' + n + ')">' + createSimpleOptions(whereTypes) + '</select></div>' +
+            '<div class="form-group" id="where-other-group-' + n + '" style="display:none;"><label>Specify location</label><input type="text" id="where-other-' + n + '" placeholder="Please specify"></div>' +
+            '<div class="form-group"><label>Who did you do this for? *</label><select id="who-for-' + n + '">' + createSimpleOptions(whoForOptions) + '</select></div>' +
+            '<div class="form-group"><label>Tools Used</label><input type="text" id="tools-' + n + '" placeholder="e.g., Phone, Laptop, None, etc."></div>' +
+            '</div>' +
+            '<div class="spatial-section">' +
+            '<h3>Ideal Room Description for This Activity *</h3>' +
+            '<p class="spatial-hint">Describe your ideal room preferences for this activity. Skip this section If the activity takes place outdoors or in a non-residential setting. If you have no specific room preference for any item, you can leave it blank.</p>' +
+            '<div class="form-grid">' +
+            '<div class="form-group"><label>Room Type</label><select id="room-type-' + n + '" onchange="toggleRoomTypeOther(' + n + ')">' + createSimpleOptions(roomTypesNoOutside) + '</select></div>' +
+            '<div class="form-group" id="room-type-other-group-' + n + '" style="display:none;"><label>Specify room type</label><input type="text" id="room-type-other-' + n + '" placeholder="Please specify"></div>' +
+            '<div class="form-group"><label>Size</label><select id="room-size-' + n + '">' + createSimpleOptions(sizeOptions) + '</select></div>' +
+            '<div class="form-group"><label>Orientation</label><select id="orientation-' + n + '">' + createSimpleOptions(orientations) + '</select></div>' +
+            '<div class="form-group full-width"><label>Adjacent to <span style="font-weight:400;color:#888;">(select all that apply)</span></label><div class="room-checkbox-group" id="adjacency-group-' + n + '">' + createCheckboxGroup('adjacency', n) + '</div></div>' +
+            '<div class="form-group full-width"><label>Connected to <span style="font-weight:400;color:#888;">(select all that apply)</span></label><div class="room-checkbox-group" id="connectivity-group-' + n + '">' + createCheckboxGroup('connectivity', n) + '</div></div>' +
+            '<div class="form-group full-width"><label>Additional Notes <span style="font-weight:400;color:#888;">(optional)</span></label><textarea id="notes-' + n + '" placeholder="Any other spatial preferences or requirements..."></textarea></div>' +
+            '</div></div></div>';
+
+        document.getElementById('entries-container').insertAdjacentHTML('beforeend', html);
+    }
+
+    function calculateDuration(id) {
+        const s = document.getElementById('start-' + id);
+        const e = document.getElementById('end-' + id);
+        const d = document.getElementById('duration-' + id);
+        if (s.value && e.value) {
+            let start = parseTime(s.value), end = parseTime(e.value);
+            if (end < start) end += 1440;
+            const diff = end - start;
+            d.textContent = 'Duration: ' + Math.floor(diff/60) + 'h ' + (diff%60) + 'm';
+        }
+    }
+
+    function parseTime(t) {
+        const [h, m] = t.split(':').map(Number);
+        return h * 60 + m;
+    }
+
+    function toggleWhereOther(id) {
+        const v = document.getElementById('where-' + id).value;
+        document.getElementById('where-other-group-' + id).style.display = v === 'other' ? 'flex' : 'none';
+    }
+
+    function toggleRoomTypeOther(id) {
+        const v = document.getElementById('room-type-' + id).value;
+        document.getElementById('room-type-other-group-' + id).style.display = v === 'other' ? 'flex' : 'none';
+    }
+
+    function getChecked(name, id) {
+        return Array.from(document.querySelectorAll('input[name="' + name + '-' + id + '"]:checked')).map(cb => cb.value);
+    }
+
+    function deleteEntry(id) {
+        const el = document.getElementById('entry-' + id);
+        if (el && confirm('Are you sure you want to delete this entry?')) el.remove();
+    }
+
+    function setSubmitting(active) {
+        document.getElementById('submitting-overlay').classList.toggle('active', active);
+        document.getElementById('submit-btn').disabled = active;
+        document.getElementById('submit-btn').textContent = active ? 'Submitting…' : 'Submit Survey';
+    }
+
+    async function submitSurvey() {
+        const prolificId = document.getElementById('prolific-id').value.trim();
+        if (!prolificId) { alert('Please enter your Prolific ID before submitting.'); return; }
+
+        const householdType = document.getElementById('household-type').value;
+        const householdSize = document.getElementById('household-size').value;
+        const workingStatus = document.getElementById('working-status').value;
+        const timeAtHome = document.getElementById('time-at-home').value;
+        if (!householdType || !householdSize || !workingStatus || !timeAtHome) {
+            alert('Please fill in all housing information.'); return;
         }
 
-        function createSimpleOptions(arr) {
-            return arr.map(o => '<option value="' + o.value + '">' + o.text + '</option>').join('');
-        }
+        const entries = [];
+        const cards = document.querySelectorAll('.entry-card');
+        let isValid = true;
 
-        function createCheckboxGroup(name, id) {
-            return roomCheckboxOptions.map(o =>
-                '<label><input type="checkbox" name="' + name + '-' + id + '" value="' + o.value + '"> ' + o.text + '</label>'
-            ).join('');
-        }
+        cards.forEach((card, index) => {
+            const id = card.id.split('-')[1];
+            const whereValue = document.getElementById('where-' + id).value;
+            const whereOther = document.getElementById('where-other-' + id).value;
+            const whereLocation = whereValue === 'other' ? whereOther : whereValue;
+            const roomTypeValue = document.getElementById('room-type-' + id).value;
+            const roomTypeOther = document.getElementById('room-type-other-' + id).value;
+            const roomType = roomTypeValue === 'other' ? roomTypeOther : roomTypeValue;
 
-        function toggleHint() {
-            const body = document.getElementById('hint-box-body');
-            const btn = document.getElementById('hint-toggle-btn');
-            const isVisible = body.style.display !== 'none';
-            body.style.display = isVisible ? 'none' : 'block';
-            btn.textContent = isVisible ? 'Show ▼' : 'Hide ▲';
-        }
-
-        function addEntry() {
-            entryCount++;
-            const n = entryCount;
-            const isFirst = n === 1;
-            const defaultStart = isFirst ? '04:00' : '';
-
-            const html = '<div class="entry-card" id="entry-' + n + '">' +
-                '<div class="entry-header">' +
-                '<span class="entry-number">Entry #' + n + '</span>' +
-                (!isFirst ? '<button class="delete-btn" onclick="deleteEntry(' + n + ')">Delete</button>' : '') +
-                '</div>' +
-                '<div class="form-grid">' +
-                '<div class="form-group"><label>Start Time *</label><input type="time" id="start-' + n + '" value="' + defaultStart + '" ' + (isFirst ? 'readonly' : '') + ' onchange="calculateDuration(' + n + ')"></div>' +
-                '<div class="form-group"><label>End Time *</label><input type="time" id="end-' + n + '" onchange="calculateDuration(' + n + ')"><div class="time-duration" id="duration-' + n + '"></div></div>' +
-                '<div class="form-group"><label>Main Activity *</label><select id="main-activity-' + n + '">' + createActivityOptions() + '</select></div>' +
-                '<div class="form-group"><label>Secondary Activity</label><select id="secondary-activity-' + n + '">' + createActivityOptions() + '</select></div>' +
-                '<div class="form-group"><label>Where *</label><select id="where-' + n + '" onchange="toggleWhereOther(' + n + ')">' + createSimpleOptions(whereTypes) + '</select></div>' +
-                '<div class="form-group" id="where-other-group-' + n + '" style="display:none;"><label>Specify location</label><input type="text" id="where-other-' + n + '" placeholder="Please specify"></div>' +
-                '<div class="form-group"><label>Who did you do this for? *</label><select id="who-for-' + n + '">' + createSimpleOptions(whoForOptions) + '</select></div>' +
-                '<div class="form-group"><label>Tools Used</label><input type="text" id="tools-' + n + '" placeholder="e.g., Phone, Laptop, None, etc."></div>' +
-                '</div>' +
-                '<div class="spatial-section">' +
-                '<h3>Ideal Room Description for This Activity *</h3>' +
-                '<p class="spatial-hint">Describe your ideal room preferences for this activity. Skip this section If the activity takes place outdoors or in a non-residential setting. If you have no specific room preference for any item, you can leave it blank.</p>' +
-                '<div class="form-grid">' +
-                '<div class="form-group"><label>Room Type</label><select id="room-type-' + n + '" onchange="toggleRoomTypeOther(' + n + ')">' + createSimpleOptions(roomTypesNoOutside) + '</select></div>' +
-                '<div class="form-group" id="room-type-other-group-' + n + '" style="display:none;"><label>Specify room type</label><input type="text" id="room-type-other-' + n + '" placeholder="Please specify"></div>' +
-                '<div class="form-group"><label>Size</label><select id="room-size-' + n + '">' + createSimpleOptions(sizeOptions) + '</select></div>' +
-                '<div class="form-group"><label>Orientation</label><select id="orientation-' + n + '">' + createSimpleOptions(orientations) + '</select></div>' +
-                '<div class="form-group full-width"><label>Adjacent to <span style="font-weight:400;color:#888;">(select all that apply)</span></label><div class="room-checkbox-group" id="adjacency-group-' + n + '">' + createCheckboxGroup('adjacency', n) + '</div></div>' +
-                '<div class="form-group full-width"><label>Connected to <span style="font-weight:400;color:#888;">(select all that apply)</span></label><div class="room-checkbox-group" id="connectivity-group-' + n + '">' + createCheckboxGroup('connectivity', n) + '</div></div>' +
-                '<div class="form-group full-width"><label>Additional Notes <span style="font-weight:400;color:#888;">(optional)</span></label><textarea id="notes-' + n + '" placeholder="Any other spatial preferences or requirements..."></textarea></div>' +
-                '</div></div></div>';
-
-            document.getElementById('entries-container').insertAdjacentHTML('beforeend', html);
-        }
-
-        function calculateDuration(id) {
-            const s = document.getElementById('start-' + id);
-            const e = document.getElementById('end-' + id);
-            const d = document.getElementById('duration-' + id);
-            if (s.value && e.value) {
-                let start = parseTime(s.value), end = parseTime(e.value);
-                if (end < start) end += 1440;
-                const diff = end - start;
-                d.textContent = 'Duration: ' + Math.floor(diff/60) + 'h ' + (diff%60) + 'm';
-            }
-        }
-
-        function parseTime(t) {
-            const [h, m] = t.split(':').map(Number);
-            return h * 60 + m;
-        }
-
-        function toggleWhereOther(id) {
-            const v = document.getElementById('where-' + id).value;
-            document.getElementById('where-other-group-' + id).style.display = v === 'other' ? 'flex' : 'none';
-        }
-
-        function toggleRoomTypeOther(id) {
-            const v = document.getElementById('room-type-' + id).value;
-            document.getElementById('room-type-other-group-' + id).style.display = v === 'other' ? 'flex' : 'none';
-        }
-
-        function getChecked(name, id) {
-            return Array.from(document.querySelectorAll('input[name="' + name + '-' + id + '"]:checked')).map(cb => cb.value);
-        }
-
-        function deleteEntry(id) {
-            const el = document.getElementById('entry-' + id);
-            if (el && confirm('Are you sure you want to delete this entry?')) el.remove();
-        }
-
-        function submitSurvey() {
-            const prolificId = document.getElementById('prolific-id').value.trim();
-            if (!prolificId) { alert('Please enter your Prolific ID before submitting.'); return; }
-
-            const householdType = document.getElementById('household-type').value;
-            const householdSize = document.getElementById('household-size').value;
-            const workingStatus = document.getElementById('working-status').value;
-            const timeAtHome = document.getElementById('time-at-home').value;
-            if (!householdType || !householdSize || !workingStatus || !timeAtHome) {
-                alert('Please fill in all housing information.'); return;
-            }
-
-            const entries = [];
-            const cards = document.querySelectorAll('.entry-card');
-            let isValid = true;
-
-            cards.forEach((card, index) => {
-                const id = card.id.split('-')[1];
-                const whereValue = document.getElementById('where-' + id).value;
-                const whereOther = document.getElementById('where-other-' + id).value;
-                const whereLocation = whereValue === 'other' ? whereOther : whereValue;
-                const roomTypeValue = document.getElementById('room-type-' + id).value;
-                const roomTypeOther = document.getElementById('room-type-other-' + id).value;
-                const roomType = roomTypeValue === 'other' ? roomTypeOther : roomTypeValue;
-
-                const entry = {
-                    entryNumber: index + 1,
-                    startTime: document.getElementById('start-' + id).value,
-                    endTime: document.getElementById('end-' + id).value,
-                    mainActivity: document.getElementById('main-activity-' + id).value,
-                    secondaryActivity: document.getElementById('secondary-activity-' + id).value,
-                    whoFor: document.getElementById('who-for-' + id).value,
-                    where: whereLocation,
-                    tools: document.getElementById('tools-' + id).value,
-                    spatialPreferences: {
-                        roomType: roomType,
-                        size: document.getElementById('room-size-' + id).value,
-                        adjacency: getChecked('adjacency', id),
-                        connectivity: getChecked('connectivity', id),
-                        orientation: document.getElementById('orientation-' + id).value,
-                        notes: document.getElementById('notes-' + id).value
-                    }
-                };
-
-                if (!entry.startTime || !entry.endTime || !entry.mainActivity || !entry.where) isValid = false;
-                if (whereValue === 'other' && !whereOther.trim()) isValid = false;
-                entries.push(entry);
-            });
-
-            if (!isValid) { alert('Please fill in all required fields (marked with *) for all entries.'); return; }
-            if (!confirm('Are you sure you want to submit your completed survey?')) return;
-
-            const surveyData = {
-                prolificId,
-                housings: { householdType, householdSize, workingStatus, timeAtHome },
-                submittedAt: new Date().toISOString(),
-                entries
+            const entry = {
+                entryNumber: index + 1,
+                startTime: document.getElementById('start-' + id).value,
+                endTime: document.getElementById('end-' + id).value,
+                mainActivity: document.getElementById('main-activity-' + id).value,
+                secondaryActivity: document.getElementById('secondary-activity-' + id).value,
+                whoFor: document.getElementById('who-for-' + id).value,
+                where: whereLocation,
+                tools: document.getElementById('tools-' + id).value,
+                spatialPreferences: {
+                    roomType: roomType,
+                    size: document.getElementById('room-size-' + id).value,
+                    adjacency: getChecked('adjacency', id),
+                    connectivity: getChecked('connectivity', id),
+                    orientation: document.getElementById('orientation-' + id).value,
+                    notes: document.getElementById('notes-' + id).value
+                }
             };
 
-            const dataUri = 'data:application/json;charset=utf-8,' + encodeURIComponent(JSON.stringify(surveyData, null, 2));
-            const a = document.createElement('a');
-            a.setAttribute('href', dataUri);
-            a.setAttribute('download', 'time-use-survey-' + prolificId + '-' + new Date().toISOString().split('T')[0] + '.json');
-            a.click();
+            if (!entry.startTime || !entry.endTime || !entry.mainActivity || !entry.where) isValid = false;
+            if (whereValue === 'other' && !whereOther.trim()) isValid = false;
+            entries.push(entry);
+        });
 
+        if (!isValid) { alert('Please fill in all required fields (marked with *) for all entries.'); return; }
+        if (!confirm('Are you sure you want to submit your completed survey?')) return;
+
+        const surveyData = {
+            prolificId,
+            housings: { householdType, householdSize, workingStatus, timeAtHome },
+            submittedAt: new Date().toISOString(),
+            entries
+        };
+
+        // Apps Script URL이 설정되지 않은 경우 안내
+
+
+        setSubmitting(true);
+
+        // hidden iframe + form 방식으로 CORS 완전 우회
+        const iframe = document.createElement('iframe');
+        iframe.name = 'hidden-submit-frame';
+        iframe.style.display = 'none';
+        document.body.appendChild(iframe);
+
+        const form = document.createElement('form');
+        form.method = 'POST';
+        form.action = APPS_SCRIPT_URL;
+        form.target = 'hidden-submit-frame';
+        form.style.display = 'none';
+
+        const input = document.createElement('input');
+        input.type = 'hidden';
+        input.name = 'data';
+        input.value = JSON.stringify(surveyData);
+        form.appendChild(input);
+        document.body.appendChild(form);
+
+        // 4초 후 완료 처리 (iframe 응답 대기)
+        setTimeout(() => {
+            setSubmitting(false);
             document.getElementById('survey-container').classList.add('hidden');
             document.getElementById('completion-page').classList.add('active');
-        }
+            document.body.removeChild(form);
+            document.body.removeChild(iframe);
+        }, 4000);
 
-        addEntry();
-    </script>
+        form.submit();
+    }
+
+    addEntry();
+</script>
 </body>
 </html>
