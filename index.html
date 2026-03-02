@@ -184,8 +184,8 @@
                 <button class="hint-toggle" id="hint-toggle-btn">Hide ▲</button>
             </div>
             <div class="hint-box-body" id="hint-box-body">
-                <p><strong>Main Activity:</strong> A Main Activity is the activity that takes most of your attention during a given time such as sleeping, eating, or working. The main activities’ timeframes <strong>cannot overlap</strong> and must <strong>account for all 24 hours</strong> of your day. For example, making dinner from 5:00 PM to 5:30 PM.</p>
-                <p><strong>Secondary Activity:</strong> A Secondary Activity is something you do <em>at the same time</em> as a main activity. For example, if your typical day includes cooking dinner between 5PM and 5:30PM, you would select cooking as the main activity for that time from the dropdown menu. If you are often checking your phone while preparing dinner, you may select ‘checking phone or tablet’ as the secondary action.</p>
+                <p><strong>Main Activity:</strong> A Main Activity is the activity that takes most of your attention during a given time such as sleeping, eating, or working. The main activities' timeframes <strong>cannot overlap</strong> and must <strong>account for all 24 hours</strong> of your day. For example, making dinner from 5:00 PM to 5:30 PM.</p>
+                <p><strong>Secondary Activity:</strong> A Secondary Activity is something you do <em>at the same time</em> as a main activity. For example, if your typical day includes cooking dinner between 5PM and 5:30PM, you would select cooking as the main activity for that time from the dropdown menu. If you are often checking your phone while preparing dinner, you may select 'checking phone or tablet' as the secondary action.</p>
             </div>
         </div>
         <div id="entries-container" class="entries-container"></div>
@@ -347,7 +347,7 @@
 
         const html = '<div class="entry-card" id="entry-' + n + '">' +
             '<div class="entry-header">' +
-            '<span class="entry-number">Entry #' + n + '</span>' +
+            '<span class="entry-number">Activity #' + n + '</span>' +
             (!isFirst ? '<button class="delete-btn" onclick="deleteEntry(' + n + ')">Delete</button>' : '') +
             '</div>' +
             '<div class="form-grid">' +
@@ -355,7 +355,7 @@
             '<div class="form-group"><label>End Time *</label><input type="time" id="end-' + n + '" onchange="calculateDuration(' + n + ')"><div class="time-duration" id="duration-' + n + '"></div></div>' +
             '<div class="form-group"><label>Main Activity *</label><select id="main-activity-' + n + '">' + createActivityOptions() + '</select></div>' +
             '<div class="form-group"><label>Secondary Activity</label><select id="secondary-activity-' + n + '">' + createActivityOptions() + '</select></div>' +
-            '<div class="form-group"><label>Where *</label><select id="where-' + n + '" onchange="toggleWhereOther(' + n + ')">' + createSimpleOptions(whereTypes) + '</select></div>' +
+            '<div class="form-group"><label>Location *</label><select id="where-' + n + '" onchange="toggleWhereOther(' + n + ')">' + createSimpleOptions(whereTypes) + '</select></div>' +
             '<div class="form-group" id="where-other-group-' + n + '" style="display:none;"><label>Specify location</label><input type="text" id="where-other-' + n + '" placeholder="Please specify"></div>' +
             '<div class="form-group"><label>Who did you do this for? *</label><select id="who-for-' + n + '">' + createSimpleOptions(whoForOptions) + '</select></div>' +
             '<div class="form-group"><label>Tools Used</label><input type="text" id="tools-' + n + '" placeholder="e.g., Phone, Laptop, None, etc."></div>' +
@@ -368,8 +368,8 @@
             '<div class="form-group" id="room-type-other-group-' + n + '" style="display:none;"><label>Specify room type</label><input type="text" id="room-type-other-' + n + '" placeholder="Please specify"></div>' +
             '<div class="form-group"><label>Size</label><select id="room-size-' + n + '">' + createSimpleOptions(sizeOptions) + '</select></div>' +
             '<div class="form-group"><label>Orientation</label><select id="orientation-' + n + '">' + createSimpleOptions(orientations) + '</select></div>' +
-            '<div class="form-group full-width"><label>Adjacent to <span style="font-weight:400;color:#888;">(select all that apply)</span></label><div class="room-checkbox-group" id="adjacency-group-' + n + '">' + createCheckboxGroup('adjacency', n) + '</div></div>' +
-            '<div class="form-group full-width"><label>Connected to <span style="font-weight:400;color:#888;">(select all that apply)</span></label><div class="room-checkbox-group" id="connectivity-group-' + n + '">' + createCheckboxGroup('connectivity', n) + '</div></div>' +
+            '<div class="form-group full-width"><label>Adjacent to <span style="font-weight:400;color:#888;">(Which rooms are located next to the room where the activity takes place? These rooms share a wall though they may not be directly accessible)</span></label><div class="room-checkbox-group" id="adjacency-group-' + n + '">' + createCheckboxGroup('adjacency', n) + '</div></div>' +
+            '<div class="form-group full-width"><label>Connected to <span style="font-weight:400;color:#888;">(Which rooms are physically connected via a door or passage for direct access to the room where the activity takes place?)</span></label><div class="room-checkbox-group" id="connectivity-group-' + n + '">' + createCheckboxGroup('connectivity', n) + '</div></div>' +
             '<div class="form-group full-width"><label>Additional Notes <span style="font-weight:400;color:#888;">(optional)</span></label><textarea id="notes-' + n + '" placeholder="Any other spatial preferences or requirements..."></textarea></div>' +
             '</div></div></div>';
 
@@ -476,9 +476,6 @@
             submittedAt: new Date().toISOString(),
             entries
         };
-
-        // Apps Script URL이 설정되지 않은 경우 안내
-
 
         setSubmitting(true);
 
