@@ -111,11 +111,13 @@
                     <label>Household Type *</label>
                     <select id="household-type" required>
                         <option value="">Select...</option>
-                        <option value="one_person">One person</option>
-                        <option value="cohabitating_couple">Cohabitating couple</option>
-                        <option value="family_no_children">Family with no children</option>
-                        <option value="family_dependent_children">Family with dependent children</option>
-                        <option value="family_nondependent_children">Family with non-dependent children only</option>
+                        <option value="one_person">One person (under65)</option>
+                        <option value="one_person">One person (65 or over)</option>
+                        <option value="family_no_children">Couple with no children</option>
+                        <option value="family_dependent_children">Couple with dependent children</option>
+                        <option value="family_nondependent_children">Couple with non-dependent children only</option>
+                        <option value="family_dependent_children">Lone parent with dependent children</option>
+                        <option value="family_nondependent_children">Lone parent with non-dependent children only</option>
                         <option value="multi_family">Multi-family</option>
                         <option value="non_relatives">Non-relatives only</option>
                     </select>
@@ -143,7 +145,7 @@
                     </select>
                 </div>
                 <div class="form-group">
-                    <label>Amount of time spent at home per day *</label>
+                    <label>Time spent at home per day *</label>
                     <select id="time-at-home" required>
                         <option value="">Select...</option>
                         <option value="under_1h">Under 1h</option>
