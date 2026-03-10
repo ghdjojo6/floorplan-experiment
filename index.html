@@ -18,6 +18,17 @@
         .housing-section { background: #fff; border: 1px solid #ddd; border-radius: 4px; padding: 20px; margin-bottom: 20px; transition: border-color 0.2s, border-width 0.2s; }
         .housing-section:focus-within { border: 2px solid #0066cc; }
         .housing-section h3 { font-size: 1.1rem; font-weight: 600; color: #222; margin-bottom: 16px; }
+
+        /* Values section */
+        .values-section { background: #fff; border: 1px solid #ddd; border-radius: 4px; padding: 20px; margin-bottom: 20px; }
+        .values-section h3 { font-size: 1.1rem; font-weight: 600; color: #222; margin-bottom: 6px; }
+        .values-desc { font-size: 0.88rem; color: #666; margin-bottom: 16px; line-height: 1.5; }
+        .values-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 10px; }
+        .value-item { display: flex; align-items: center; gap: 10px; background: #f9f9f9; border: 1px solid #e5e5e5; border-radius: 4px; padding: 10px 14px; cursor: pointer; transition: border-color 0.15s, background 0.15s; }
+        .value-item:hover { border-color: #0066cc; background: #eef4ff; }
+        .value-item input[type="radio"] { accent-color: #0066cc; width: 16px; height: 16px; cursor: pointer; flex-shrink: 0; }
+        .value-item label { font-size: 0.92rem; color: #333; cursor: pointer; line-height: 1.4; }
+
         .info-box { background: #fff; border: 1px solid #ddd; border-radius: 4px; padding: 16px; margin-bottom: 30px; border-left: 4px solid #0066cc; }
         .info-box p { color: #555; font-size: 0.95rem; }
         .completion-page { display: none; text-align: center; padding: 60px 20px; }
@@ -50,7 +61,7 @@
         textarea { resize: vertical; min-height: 80px; }
         .spatial-section { background: #f9f9f9; border: 1px solid #e5e5e5; border-radius: 4px; padding: 16px; margin-top: 16px; }
         .spatial-section h3 { font-size: 1rem; font-weight: 600; color: #333; margin-bottom: 4px; }
-        .spatial-hint { font-size: 0.85rem; color: #666; margin-bottom: 16px; }
+        .spatial-hint { font-size: 0.85rem; color: #666; margin-bottom: 16px; line-height: 1.55; }
         .add-entry-btn, .submit-btn { background: #0066cc; border: none; color: white; padding: 12px 24px; border-radius: 4px; cursor: pointer; font-size: 1rem; font-weight: 500; margin-top: 16px; width: 100%; }
         .add-entry-btn:hover, .submit-btn:hover { background: #0052a3; }
         .submit-btn { background: #28a745; margin-top: 30px; }
@@ -69,7 +80,6 @@
         .hint-box-body p:last-child { margin-bottom: 0; }
         .hint-box-body strong { color: #0055aa; }
 
-        /* 제출 상태 오버레이 */
         .submitting-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.45); z-index: 1000; align-items: center; justify-content: center; }
         .submitting-overlay.active { display: flex; }
         .submitting-box { background: #fff; border-radius: 8px; padding: 40px 48px; text-align: center; box-shadow: 0 8px 32px rgba(0,0,0,0.18); }
@@ -81,12 +91,12 @@
             h1 { font-size: 1.5rem; }
             .form-grid { grid-template-columns: 1fr; }
             .entry-header { flex-direction: column; align-items: flex-start; gap: 10px; }
+            .values-grid { grid-template-columns: 1fr; }
         }
     </style>
 </head>
 <body>
 
-<!-- 제출 중 오버레이 -->
 <div class="submitting-overlay" id="submitting-overlay">
     <div class="submitting-box">
         <div class="spinner"></div>
@@ -100,10 +110,14 @@
             <h1>Daily Activity &amp; Housing Preference Survey</h1>
             <p class="subtitle">Document your weekday activities and describe your ideal residential room structure for each activity</p>
         </header>
+
+        <!-- Prolific ID -->
         <div class="prolific-section">
             <label for="prolific-id">Prolific ID *</label>
             <input type="text" id="prolific-id" placeholder="Enter your Prolific ID" required>
         </div>
+
+        <!-- Housing Information -->
         <div class="housing-section">
             <h3>Housing Information</h3>
             <div class="form-grid">
@@ -145,7 +159,7 @@
                     </select>
                 </div>
                 <div class="form-group">
-                    <label>Amount of time spent at home *</label>
+                    <label>Daily Time at Home *</label>
                     <select id="time-at-home" required>
                         <option value="">Select...</option>
                         <option value="under_1h">Under 1h</option>
@@ -177,23 +191,73 @@
                 </div>
             </div>
         </div>
+
+        <!-- Residential Values -->
+        <div class="values-section">
+            <h3>Residential Values *</h3>
+            <p class="values-desc">What is the most important value to you when it comes to residential preferences &amp; choices? Please select <strong>one</strong> option that best reflects your priorities.</p>
+            <div class="values-grid">
+                <div class="value-item">
+                    <input type="radio" name="residential-value" id="val-exciting" value="an_exciting_life">
+                    <label for="val-exciting">An exciting life</label>
+                </div>
+                <div class="value-item">
+                    <input type="radio" name="residential-value" id="val-peace" value="a_dwelling_environment_at_peace">
+                    <label for="val-peace">A dwelling environment at peace</label>
+                </div>
+                <div class="value-item">
+                    <input type="radio" name="residential-value" id="val-pleasure" value="pleasure">
+                    <label for="val-pleasure">Pleasure</label>
+                </div>
+                <div class="value-item">
+                    <input type="radio" name="residential-value" id="val-image" value="preserving_my_public_image">
+                    <label for="val-image">Preserving my public image</label>
+                </div>
+                <div class="value-item">
+                    <input type="radio" name="residential-value" id="val-security" value="security">
+                    <label for="val-security">Security</label>
+                </div>
+                <div class="value-item">
+                    <input type="radio" name="residential-value" id="val-self-respect" value="self_respect">
+                    <label for="val-self-respect">Self-respect</label>
+                </div>
+                <div class="value-item">
+                    <input type="radio" name="residential-value" id="val-social-recognition" value="social_recognition">
+                    <label for="val-social-recognition">Social recognition</label>
+                </div>
+                <div class="value-item">
+                    <input type="radio" name="residential-value" id="val-social-power" value="social_power">
+                    <label for="val-social-power">Social power</label>
+                </div>
+                <div class="value-item">
+                    <input type="radio" name="residential-value" id="val-nature" value="unity_with_nature">
+                    <label for="val-nature">Unity with nature</label>
+                </div>
+            </div>
+        </div>
+
+        <!-- Info box -->
         <div class="info-box">
             <p>📋 <strong>Please record all activities from 4:00 AM to 4:00 AM (the following day)</strong> during a typical weekday. For each activity, <strong>describe your ideal residential room preferences</strong> for performing that activity. You can add entries for additional activities, and please be as specific as possible.</p>
         </div>
+
+        <!-- Hint box -->
         <div class="hint-box" id="hint-box">
             <div class="hint-box-header" onclick="toggleHint()">
                 <span>💡 How to fill in activities</span>
                 <button class="hint-toggle" id="hint-toggle-btn">Hide ▲</button>
             </div>
             <div class="hint-box-body" id="hint-box-body">
-                <p><strong>Main Activity:</strong> A Main Activity is the activity that takes most of your attention during a given time such as sleeping, eating, or working. The main activities timeframes <strong>cannot overlap</strong> and must <strong>account for all 24 hours</strong> of your day. For example, making dinner from 5:00 PM to 5:30 PM.</p>
+                <p><strong>Main Activity:</strong> A Main Activity is the activity that takes most of your attention during a given time such as sleeping, eating, or working. The main activities' timeframes <strong>cannot overlap</strong> and must <strong>account for all 24 hours</strong> of your day. For example, making dinner from 5:00 PM to 5:30 PM.</p>
                 <p><strong>Secondary Activity:</strong> A Secondary Activity is something you do <strong>at the same time</strong> as a main activity. For example, if your typical day includes cooking dinner between 5PM and 5:30PM, you would select cooking as the main activity. If you are often checking your phone while preparing dinner, you may select checking phone or tablet as the secondary action.</p>
             </div>
         </div>
+
         <div id="entries-container" class="entries-container"></div>
         <button class="add-entry-btn" onclick="addEntry()">+ Add Activity Entry</button>
         <button class="submit-btn" id="submit-btn" onclick="submitSurvey()">Submit Survey</button>
     </div>
+
     <div class="completion-page" id="completion-page">
         <div class="completion-box">
             <h2>&#10003; Survey Complete!</h2>
@@ -206,11 +270,7 @@
 </div>
 
 <script>
-    // =========================================================
-    // ★ Google Apps Script Web App URL★
-    // =========================================================
     const APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxs_LS3HMhsFuK6JJL0iSu_ObHX39SuZ0IDrN7jUGiq86bCg-62MHE4zo_2ZBLrqkPwvg/exec";
-    // =========================================================
 
     const activitiesGrouped = [
         { label: "Sleeping, personal care, medication", options: [{value:"1",text:"1. Sleeping"},{value:"2",text:"2. Washing, dressing, using the bathroom and self-grooming"},{value:"3",text:"3. Medication, other health related care"}]},
@@ -255,8 +315,10 @@
         {value:"other",text:"Other Place"}
     ];
 
+    // Room type / size / orientation all include "No preference / Non-residential" as the first selectable option
     const roomTypesNoOutside = [
         {value:"",text:"Select room type..."},
+        {value:"no_preference",text:"No preference / Non-residential"},
         {value:"living_room",text:"Living Room"},
         {value:"kitchen",text:"Kitchen"},
         {value:"dining_room",text:"Dining Room"},
@@ -272,6 +334,27 @@
         {value:"storage",text:"Storage"},
         {value:"garage",text:"Garage"},
         {value:"balcony_terrace_garden",text:"Balcony/Terrace/Garden"}
+    ];
+
+    const sizeOptions = [
+        {value:"",text:"Select size..."},
+        {value:"no_preference",text:"No preference / Non-residential"},
+        {value:"under_30sqft",text:"Under 30 sq ft (About the size of one to two standard desks)"},
+        {value:"30_60sqft",text:"30–60 sq ft (About the size of a single bed)"},
+        {value:"60_100sqft",text:"60–100 sq ft (About the size of a queen bed with minimal clearance)"},
+        {value:"100_160sqft",text:"100–160 sq ft (About the size of two queen beds)"},
+        {value:"160_220sqft",text:"160–220 sq ft (About the size of a small car)"},
+        {value:"220_300sqft",text:"220–300 sq ft (About the size of a standard parking space)"},
+        {value:"over_300sqft",text:"Over 300 sq ft (About the size of a large studio apartment)"}
+    ];
+
+    const orientations = [
+        {value:"",text:"Select orientation..."},
+        {value:"no_preference",text:"No preference / Non-residential"},
+        {value:"north",text:"North"},
+        {value:"south",text:"South"},
+        {value:"east",text:"East"},
+        {value:"west",text:"West"}
     ];
 
     const roomCheckboxOptions = [
@@ -292,25 +375,6 @@
         {value:"balcony_terrace_garden",text:"Balcony/Terrace/Garden"}
     ];
 
-    const sizeOptions = [
-        { value:"", text:"Select size..." },
-        { value:"under_30sqft", text:"Under 30 sq ft (About the size of one to two standard desks)" },
-        { value:"30_60sqft", text:"30–60 sq ft (About the size of a single bed)" },
-        { value:"60_100sqft", text:"60–100 sq ft (About the size of a queen bed with minimal clearance)" },
-        { value:"100_160sqft", text:"100–160 sq ft (About the size of two queen beds)" },
-        { value:"160_220sqft", text:"160–220 sq ft (About the size of a small car)" },
-        { value:"220_300sqft", text:"220–300 sq ft (About the size of a standard parking space)" },
-        { value:"over_300sqft", text:"Over 300 sq ft (About the size of a large studio apartment)" }
-    ];
-
-    const orientations = [
-        {value:"",text:"Select orientation..."},
-        {value:"north",text:"North"},
-        {value:"south",text:"South"},
-        {value:"east",text:"East"},
-        {value:"west",text:"West"}
-    ];
-
     let entryCount = 0;
 
     function createActivityOptions() {
@@ -327,10 +391,26 @@
         return arr.map(o => '<option value="' + o.value + '">' + o.text + '</option>').join('');
     }
 
+    // Checkbox group: "No preference / Non-residential" is first and mutually exclusive with room selections
     function createCheckboxGroup(name, id) {
-        return roomCheckboxOptions.map(o =>
-            '<label><input type="checkbox" name="' + name + '-' + id + '" value="' + o.value + '"> ' + o.text + '</label>'
+        let html = '<label style="color:#666;font-style:italic;"><input type="checkbox" name="' + name + '-' + id + '" value="no_preference" onchange="handleNoPreference(this,\'' + name + '\',' + id + ')"> No preference / Non-residential</label>';
+        html += roomCheckboxOptions.map(o =>
+            '<label><input type="checkbox" name="' + name + '-' + id + '" value="' + o.value + '" onchange="handleRoomCheck(this,\'' + name + '\',' + id + ')"> ' + o.text + '</label>'
         ).join('');
+        return html;
+    }
+
+    function handleNoPreference(cb, name, id) {
+        if (cb.checked) {
+            document.querySelectorAll('input[name="' + name + '-' + id + '"]:not([value="no_preference"])').forEach(el => el.checked = false);
+        }
+    }
+
+    function handleRoomCheck(cb, name, id) {
+        if (cb.checked) {
+            const noPref = document.querySelector('input[name="' + name + '-' + id + '"][value="no_preference"]');
+            if (noPref) noPref.checked = false;
+        }
     }
 
     function toggleHint() {
@@ -349,7 +429,7 @@
 
         const html = '<div class="entry-card" id="entry-' + n + '">' +
             '<div class="entry-header">' +
-            '<span class="entry-number">Entry #' + n + '</span>' +
+            '<span class="entry-number">Activity #' + n + '</span>' +
             (!isFirst ? '<button class="delete-btn" onclick="deleteEntry(' + n + ')">Delete</button>' : '') +
             '</div>' +
             '<div class="form-grid">' +
@@ -357,21 +437,20 @@
             '<div class="form-group"><label>End Time *</label><input type="time" id="end-' + n + '" onchange="calculateDuration(' + n + ')"><div class="time-duration" id="duration-' + n + '"></div></div>' +
             '<div class="form-group"><label>Main Activity *</label><select id="main-activity-' + n + '">' + createActivityOptions() + '</select></div>' +
             '<div class="form-group"><label>Secondary Activity</label><select id="secondary-activity-' + n + '">' + createActivityOptions() + '</select></div>' +
-            '<div class="form-group"><label>Where *</label><select id="where-' + n + '" onchange="toggleWhereOther(' + n + ')">' + createSimpleOptions(whereTypes) + '</select></div>' +
+            '<div class="form-group"><label>Location *</label><select id="where-' + n + '" onchange="toggleWhereOther(' + n + ')">' + createSimpleOptions(whereTypes) + '</select></div>' +
             '<div class="form-group" id="where-other-group-' + n + '" style="display:none;"><label>Specify location</label><input type="text" id="where-other-' + n + '" placeholder="Please specify"></div>' +
             '<div class="form-group"><label>Who did you do this for? *</label><select id="who-for-' + n + '">' + createSimpleOptions(whoForOptions) + '</select></div>' +
             '<div class="form-group"><label>Tools Used</label><input type="text" id="tools-' + n + '" placeholder="e.g., Phone, Laptop, None, etc."></div>' +
             '</div>' +
             '<div class="spatial-section">' +
             '<h3>Ideal Room Description for This Activity *</h3>' +
-            '<p class="spatial-hint">Describe your ideal room preferences for this activity. Skip this section If the activity takes place outdoors or in a non-residential setting. If you have no specific room preference for any item, you can leave it blank.</p>' +
+            '<p class="spatial-hint">For each field below, describe your ideal room preference for this activity. If the activity takes place <strong>outdoors or in a non-residential setting</strong>, or if you have <strong>no specific room preference</strong>, please select <strong>"No preference / Non-residential"</strong> for the dropdowns and check <strong>"No preference / Non-residential"</strong> for the adjacency and connectivity options. At least one selection is required for each field.</p>' +
             '<div class="form-grid">' +
-            '<div class="form-group"><label>Room Type</label><select id="room-type-' + n + '" onchange="toggleRoomTypeOther(' + n + ')">' + createSimpleOptions(roomTypesNoOutside) + '</select></div>' +
-            '<div class="form-group" id="room-type-other-group-' + n + '" style="display:none;"><label>Specify room type</label><input type="text" id="room-type-other-' + n + '" placeholder="Please specify"></div>' +
-            '<div class="form-group"><label>Size</label><select id="room-size-' + n + '">' + createSimpleOptions(sizeOptions) + '</select></div>' +
-            '<div class="form-group"><label>Orientation</label><select id="orientation-' + n + '">' + createSimpleOptions(orientations) + '</select></div>' +
-            '<div class="form-group full-width"><label>Adjacent to <span style="font-weight:400;color:#888;">(select all that apply)</span></label><div class="room-checkbox-group" id="adjacency-group-' + n + '">' + createCheckboxGroup('adjacency', n) + '</div></div>' +
-            '<div class="form-group full-width"><label>Connected to <span style="font-weight:400;color:#888;">(select all that apply)</span></label><div class="room-checkbox-group" id="connectivity-group-' + n + '">' + createCheckboxGroup('connectivity', n) + '</div></div>' +
+            '<div class="form-group"><label>Room Type *</label><select id="room-type-' + n + '">' + createSimpleOptions(roomTypesNoOutside) + '</select></div>' +
+            '<div class="form-group"><label>Size *</label><select id="room-size-' + n + '">' + createSimpleOptions(sizeOptions) + '</select></div>' +
+            '<div class="form-group"><label>Orientation *</label><select id="orientation-' + n + '">' + createSimpleOptions(orientations) + '</select></div>' +
+            '<div class="form-group full-width"><label>Adjacent to * <span style="font-weight:400;color:#888;">(Which rooms are located next to the room where the activity takes place? These rooms share a wall though they may not be directly accessible)</span></label><div class="room-checkbox-group" id="adjacency-group-' + n + '">' + createCheckboxGroup('adjacency', n) + '</div></div>' +
+            '<div class="form-group full-width"><label>Connected to * <span style="font-weight:400;color:#888;">(Which rooms are physically connected via a door or passage for direct access to the room where the activity takes place?)</span></label><div class="room-checkbox-group" id="connectivity-group-' + n + '">' + createCheckboxGroup('connectivity', n) + '</div></div>' +
             '<div class="form-group full-width"><label>Additional Notes <span style="font-weight:400;color:#888;">(optional)</span></label><textarea id="notes-' + n + '" placeholder="Any other spatial preferences or requirements..."></textarea></div>' +
             '</div></div></div>';
 
@@ -398,11 +477,6 @@
     function toggleWhereOther(id) {
         const v = document.getElementById('where-' + id).value;
         document.getElementById('where-other-group-' + id).style.display = v === 'other' ? 'flex' : 'none';
-    }
-
-    function toggleRoomTypeOther(id) {
-        const v = document.getElementById('room-type-' + id).value;
-        document.getElementById('room-type-other-group-' + id).style.display = v === 'other' ? 'flex' : 'none';
     }
 
     function getChecked(name, id) {
@@ -432,21 +506,67 @@
             alert('Please fill in all housing information.'); return;
         }
 
+        // Validate residential values
+        const selectedValue = document.querySelector('input[name="residential-value"]:checked');
+        if (!selectedValue) {
+            alert('Please select a value under "Residential Values" before submitting.'); return;
+        }
+
         const entries = [];
         const cards = document.querySelectorAll('.entry-card');
         let isValid = true;
+        const missingFields = [];
 
         cards.forEach((card, index) => {
             const id = card.id.split('-')[1];
+            const actNum = index + 1;
+
             const whereValue = document.getElementById('where-' + id).value;
             const whereOther = document.getElementById('where-other-' + id).value;
             const whereLocation = whereValue === 'other' ? whereOther : whereValue;
             const roomTypeValue = document.getElementById('room-type-' + id).value;
-            const roomTypeOther = document.getElementById('room-type-other-' + id).value;
-            const roomType = roomTypeValue === 'other' ? roomTypeOther : roomTypeValue;
+            const roomSizeValue = document.getElementById('room-size-' + id).value;
+            const orientationValue = document.getElementById('orientation-' + id).value;
+            const adjacency = getChecked('adjacency', id);
+            const connectivity = getChecked('connectivity', id);
 
-            const entry = {
-                entryNumber: index + 1,
+            // Basic required field checks
+            if (!document.getElementById('start-' + id).value ||
+                !document.getElementById('end-' + id).value ||
+                !document.getElementById('main-activity-' + id).value ||
+                !whereLocation) {
+                isValid = false;
+                missingFields.push('Activity #' + actNum + ': Please fill in all required fields (Start Time, End Time, Main Activity, Location).');
+            }
+            if (whereValue === 'other' && !whereOther.trim()) {
+                isValid = false;
+                missingFields.push('Activity #' + actNum + ': Please specify the location.');
+            }
+
+            // Room description required checks
+            if (!roomTypeValue) {
+                isValid = false;
+                missingFields.push('Activity #' + actNum + ': Room Type is required — select a room type or "No preference / Non-residential".');
+            }
+            if (!roomSizeValue) {
+                isValid = false;
+                missingFields.push('Activity #' + actNum + ': Size is required — select a size or "No preference / Non-residential".');
+            }
+            if (!orientationValue) {
+                isValid = false;
+                missingFields.push('Activity #' + actNum + ': Orientation is required — select an orientation or "No preference / Non-residential".');
+            }
+            if (adjacency.length === 0) {
+                isValid = false;
+                missingFields.push('Activity #' + actNum + ': "Adjacent to" — please select at least one option or check "No preference / Non-residential".');
+            }
+            if (connectivity.length === 0) {
+                isValid = false;
+                missingFields.push('Activity #' + actNum + ': "Connected to" — please select at least one option or check "No preference / Non-residential".');
+            }
+
+            entries.push({
+                entryNumber: actNum,
                 startTime: document.getElementById('start-' + id).value,
                 endTime: document.getElementById('end-' + id).value,
                 mainActivity: document.getElementById('main-activity-' + id).value,
@@ -455,36 +575,33 @@
                 where: whereLocation,
                 tools: document.getElementById('tools-' + id).value,
                 spatialPreferences: {
-                    roomType: roomType,
-                    size: document.getElementById('room-size-' + id).value,
-                    adjacency: getChecked('adjacency', id),
-                    connectivity: getChecked('connectivity', id),
-                    orientation: document.getElementById('orientation-' + id).value,
+                    roomType: roomTypeValue,
+                    size: roomSizeValue,
+                    adjacency: adjacency,
+                    connectivity: connectivity,
+                    orientation: orientationValue,
                     notes: document.getElementById('notes-' + id).value
                 }
-            };
-
-            if (!entry.startTime || !entry.endTime || !entry.mainActivity || !entry.where) isValid = false;
-            if (whereValue === 'other' && !whereOther.trim()) isValid = false;
-            entries.push(entry);
+            });
         });
 
-        if (!isValid) { alert('Please fill in all required fields (marked with *) for all entries.'); return; }
+        if (!isValid) {
+            alert('Please complete the following before submitting:\n\n' + missingFields.join('\n'));
+            return;
+        }
+
         if (!confirm('Are you sure you want to submit your completed survey?')) return;
 
         const surveyData = {
             prolificId,
             housings: { householdType, householdSize, workingStatus, timeAtHome },
+            residentialValue: selectedValue.value,
             submittedAt: new Date().toISOString(),
             entries
         };
 
-        // Apps Script URL이 설정되지 않은 경우 안내
-
-
         setSubmitting(true);
 
-        // hidden iframe + form 방식으로 CORS 완전 우회
         const iframe = document.createElement('iframe');
         iframe.name = 'hidden-submit-frame';
         iframe.style.display = 'none';
@@ -503,7 +620,6 @@
         form.appendChild(input);
         document.body.appendChild(form);
 
-        // (iframe 응답 대기)
         setTimeout(() => {
             setSubmitting(false);
             document.getElementById('survey-container').classList.add('hidden');
