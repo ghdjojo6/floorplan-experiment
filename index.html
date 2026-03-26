@@ -159,6 +159,16 @@
                     </select>
                 </div>
                 <div class="form-group">
+                    <label>How many pets do you have? *</label>
+                    <select id="pet-count" required>
+                        <option value="">Select...</option>
+                        <option value="none">None</option>
+                        <option value="1">1</option>
+                        <option value="2">2</option>
+                        <option value="3_or_more">3 or more</option>
+                    </select>
+                </div>
+                <div class="form-group">
                     <label>Daily Time at Home *</label>
                     <select id="time-at-home" required>
                         <option value="">Select...</option>
@@ -330,15 +340,15 @@
     ];
 
     const sizeOptions = [
-        {value:"", text:"Select size..."},
-        {value:"no_preference", text:"No preference / Non-residential"},
-        {value:"50", text:"Under 70 sq ft (About the size of a walk-in closet)"},
-        {value:"70", text:"Around 70 sq ft (About the size of a queen bed)"},
-        {value:"140", text:"Around 140 sq ft (About the size of two queen beds)"},
-        {value:"210", text:"Around 210 sq ft (About the size of a large SUV)"},
-        {value:"280", text:"Around 280 sq ft (About the size of a standard parking space)"},
-        {value:"350", text:"Around 350 sq ft (About the size of a school bus)"},
-        {value:"420", text:"420 sq ft or larger (About the size of a city bus)"},
+        {value:"",text:"Select size..."},
+        {value:"no_preference",text:"No preference / Non-residential"},
+        {value:"under_30sqft",text:"Under 30 sq ft (About the size of one to two standard desks)"},
+        {value:"30_60sqft",text:"30–60 sq ft (About the size of a single bed)"},
+        {value:"60_100sqft",text:"60–100 sq ft (About the size of a queen bed with minimal clearance)"},
+        {value:"100_160sqft",text:"100–160 sq ft (About the size of two queen beds)"},
+        {value:"160_220sqft",text:"160–220 sq ft (About the size of a small car)"},
+        {value:"220_300sqft",text:"220–300 sq ft (About the size of a standard parking space)"},
+        {value:"over_300sqft",text:"Over 300 sq ft (About the size of a large studio apartment)"}
     ];
 
     const orientations = [
@@ -404,11 +414,11 @@
             '</select></div>' +
             '<div class="form-group full-width"><label>Who was involved? <span style="font-weight:400;color:#888;">(select all that apply)</span></label>' +
             '<div class="room-checkbox-group">' +
-            '<label><input type="checkbox" name="who-type-' + n + '" value="baby"> Baby (under 3)</label>' +
-            '<label><input type="checkbox" name="who-type-' + n + '" value="child"> Child (under 18)</label>' +
-            '<label><input type="checkbox" name="who-type-' + n + '" value="adult"> Adult</label>' +
-            '<label><input type="checkbox" name="who-type-' + n + '" value="elder"> Elder (65 or over)</label>' +
-            '<label><input type="checkbox" name="who-type-' + n + '" value="pet"> Pet</label>' +
+            '<label><input type="checkbox" name="people-type-' + n + '" value="baby"> Baby (under 3)</label>' +
+            '<label><input type="checkbox" name="people-type-' + n + '" value="child"> Child (under 18)</label>' +
+            '<label><input type="checkbox" name="people-type-' + n + '" value="adult"> Adult</label>' +
+            '<label><input type="checkbox" name="people-type-' + n + '" value="elder"> Elder (65 or over)</label>' +
+            '<label><input type="checkbox" name="people-type-' + n + '" value="pet"> Pet</label>' +
             '</div></div>' +
             '</div>' +
             '<div class="spatial-section">' +
@@ -470,7 +480,8 @@
         const householdSize = document.getElementById('household-size').value;
         const workingStatus = document.getElementById('working-status').value;
         const timeAtHome = document.getElementById('time-at-home').value;
-        if (!householdType || !householdSize || !workingStatus || !timeAtHome) {
+        const petCount = document.getElementById('pet-count').value;
+        if (!householdType || !householdSize || !workingStatus || !timeAtHome || !petCount) {
             alert('Please fill in all housing information.'); return;
         }
 
@@ -566,7 +577,7 @@
 
         const surveyData = {
             prolificId,
-            housings: { householdType, householdSize, workingStatus, timeAtHome },
+            housings: { householdType, householdSize, workingStatus, timeAtHome, petCount },
             residentialValue: selectedValue.value,
             submittedAt: new Date().toISOString(),
             entries
