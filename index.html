@@ -284,20 +284,6 @@
         { label: "Other or personal", options: [{value:"74",text:"74. Other activities not listed"},{value:"75",text:"75. Praying"},{value:"76",text:"76. Smoking or vaping"},{value:"77",text:"77. Completing the time-use diary"}]}
     ];
 
-    const whereTypes = [
-        {value:"",text:"Select location..."},
-        {value:"living_room",text:"Living Room"},
-        {value:"kitchen",text:"Kitchen"},
-        {value:"dining_room",text:"Dining Room"},
-        {value:"bedroom1",text:"Bedroom1"},{value:"bedroom2",text:"Bedroom2"},{value:"bedroom3",text:"Bedroom3"},
-        {value:"bedroom4",text:"Bedroom4"},{value:"bedroom5",text:"Bedroom5"},{value:"bedroom6",text:"Bedroom6"},
-        {value:"bathroom1",text:"Bathroom1"},{value:"bathroom2",text:"Bathroom2"},{value:"bathroom3",text:"Bathroom3"},
-        {value:"storage_balcony",text:"Storage/Balcony"},
-        {value:"garage",text:"Garage"},
-        {value:"garden",text:"Garden"},
-        {value:"other",text:"Other Place"}
-    ];
-
     const roomTypesNoOutside = [
         {value:"",text:"Select room type..."},
         {value:"living_room",text:"Living Room"},
@@ -310,27 +296,6 @@
         {value:"garden",text:"Garden"},
         {value:"front_door",text:"Front Door"},
         {value:"outside",text:"Outside"}
-    ];
-
-    const sizeOptions = [
-        {value:"", text:"Select size..."},
-        {value:"no_preference", text:"No preference / Non-residential"},
-        {value:"50", text:"Under 70 sq ft (About the size of a walk-in closet)"},
-        {value:"70", text:"Around 70 sq ft (About the size of a queen bed)"},
-        {value:"140", text:"Around 140 sq ft (About the size of two queen beds)"},
-        {value:"210", text:"Around 210 sq ft (About the size of a large SUV)"},
-        {value:"280", text:"Around 280 sq ft (About the size of a standard garage)"},
-        {value:"350", text:"Around 350 sq ft (About the size of a school bus)"},
-        {value:"420", text:"Around 420 sq ft or larger (About the size of a city bus)"},
-    ];
-
-    const orientations = [
-        {value:"",text:"Select orientation..."},
-        {value:"no_preference",text:"No preference / Non-residential"},
-        {value:"north",text:"North"},
-        {value:"south",text:"South"},
-        {value:"east",text:"East"},
-        {value:"west",text:"West"}
     ];
 
     // entryCount is now used only for generating unique internal IDs, never shown to users
@@ -534,8 +499,7 @@
             '<div class="form-group"><label>End Time *</label><div id="end-wrap-' + n + '"></div><div class="time-duration" id="duration-' + n + '"></div></div>' +
             '<div class="form-group"><label>Main Activity *</label><select id="main-activity-' + n + '">' + createActivityOptions() + '</select></div>' +
             '<div class="form-group"><label>Secondary Activity</label><select id="secondary-activity-' + n + '">' + createActivityOptions() + '</select></div>' +
-            '<div class="form-group"><label>Location *</label><select id="where-' + n + '" onchange="toggleWhereOther(' + n + ')">' + createSimpleOptions(whereTypes) + '</select></div>' +
-            '<div class="form-group" id="where-other-group-' + n + '" style="display:none;"><label>Specify location</label><input type="text" id="where-other-' + n + '" placeholder="Please specify"></div>' +
+            '<div class="form-group"><label>Room Type *</label><select id="room-type-' + n + '">' + createSimpleOptions(roomTypesNoOutside) + '</select></div>' +
             '<div class="form-group"><label>Number of People Involved *</label><select id="people-count-' + n + '">' +
             '<option value="">Select...</option>' +
             '<option value="1">1 (alone)</option>' +
@@ -555,12 +519,7 @@
             '</div></div>' +
             '</div>' +
             '<div class="spatial-section">' +
-            '<h3>Ideal Room Description for This Activity *</h3>' +
-            '<p class="spatial-hint">For each field below, describe your ideal room preference for this activity. If the activity takes place <strong>outdoors or in a non-residential setting</strong>, or if you have <strong>no specific room preference</strong>, please select <strong>"No preference / Non-residential"</strong>. At least one selection is required for each field.</p>' +
             '<div class="form-grid">' +
-            '<div class="form-group"><label>Room Type *</label><select id="room-type-' + n + '">' + createSimpleOptions(roomTypesNoOutside) + '</select></div>' +
-            '<div class="form-group"><label>Size *</label><select id="room-size-' + n + '">' + createSimpleOptions(sizeOptions) + '</select></div>' +
-            '<div class="form-group"><label>Orientation *</label><select id="orientation-' + n + '">' + createSimpleOptions(orientations) + '</select></div>' +
             '<div class="form-group full-width"><label>Additional Notes <span style="font-weight:400;color:#888;">(optional)</span></label><textarea id="notes-' + n + '" placeholder="Any other spatial preferences or requirements..."></textarea></div>' +
             '</div></div></div>';
 
@@ -591,11 +550,6 @@
     function parseTime(t) {
         const [h, m] = t.split(':').map(Number);
         return h * 60 + m;
-    }
-
-    function toggleWhereOther(id) {
-        const v = document.getElementById('where-' + id).value;
-        document.getElementById('where-other-group-' + id).style.display = v === 'other' ? 'flex' : 'none';
     }
 
     function getChecked(name, id) {
@@ -647,26 +601,14 @@
 
             const startTime = timeValues['start-' + id] || '';
             const endTime = timeValues['end-' + id] || '';
-            const whereValue = document.getElementById('where-' + id).value;
-            const whereOther = document.getElementById('where-other-' + id) ? document.getElementById('where-other-' + id).value : '';
-            const whereLocation = whereValue === 'other' ? whereOther : whereValue;
             const roomTypeValue = document.getElementById('room-type-' + id).value;
-            const roomSizeValue = document.getElementById('room-size-' + id).value;
-            const orientationValue = document.getElementById('orientation-' + id).value;
             const peopleCount = document.getElementById('people-count-' + id).value;
             const peopleTypes = getChecked('people-type', id);
 
-            if (!startTime || !endTime || !document.getElementById('main-activity-' + id).value || !whereLocation) {
+            if (!startTime || !endTime || !document.getElementById('main-activity-' + id).value || !roomTypeValue) {
                 isValid = false;
-                missingFields.push('Activity #' + actNum + ': Please fill in all required fields (Start Time, End Time, Main Activity, Location).');
+                missingFields.push('Activity #' + actNum + ': Please fill in all required fields (Start Time, End Time, Main Activity, Room Type).');
             }
-            if (whereValue === 'other' && !whereOther.trim()) {
-                isValid = false;
-                missingFields.push('Activity #' + actNum + ': Please specify the location.');
-            }
-            if (!roomTypeValue) { isValid = false; missingFields.push('Activity #' + actNum + ': Room Type is required — select a room type or "No preference / Non-residential".'); }
-            if (!roomSizeValue) { isValid = false; missingFields.push('Activity #' + actNum + ': Size is required — select a size or "No preference / Non-residential".'); }
-            if (!orientationValue) { isValid = false; missingFields.push('Activity #' + actNum + ': Orientation is required — select an orientation or "No preference / Non-residential".'); }
 
             entries.push({
                 entryNumber: actNum,
@@ -674,11 +616,8 @@
                 mainActivity: document.getElementById('main-activity-' + id).value,
                 secondaryActivity: document.getElementById('secondary-activity-' + id).value,
                 peopleCount, peopleTypes,
-                where: whereLocation,
                 spatialPreferences: {
                     roomType: roomTypeValue,
-                    size: roomSizeValue,
-                    orientation: orientationValue,
                     notes: document.getElementById('notes-' + id).value
                 }
             });
